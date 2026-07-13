@@ -25,13 +25,13 @@ const fullNameSchema = z
   .max(50, "Full name cannot exceed 50 characters.")
   .regex(/^[A-Za-z\s]+$/, "Full name can only contain letters and spaces.");
 
-// Register Schema
+// SignUp Schema
 
-export const registerSchema = z
+export const signupSchema = z
   .object({
     fullName: fullNameSchema,
     email: emailSchema,
-    phone: phoneSchema,
+    phoneNumber: phoneSchema,
     password: passwordSchema,
     confirmPassword: z.string()
   })
@@ -40,7 +40,7 @@ export const registerSchema = z
     path: ["confirmPassword"],
   });
 
-export type RegisterInput = z.infer<typeof registerSchema>;
+export type SignupInput = z.infer<typeof signupSchema>;
 
 // Login Schema
 

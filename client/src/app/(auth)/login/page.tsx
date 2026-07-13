@@ -13,7 +13,7 @@ import { FaApple, FaGithub } from "react-icons/fa";
 
 type LoginErrors = Partial<Record<keyof LoginInput, string[]>>;
 
-const login = () => {
+const Login = () => {
     const router = useRouter();
     //   const { loading, login } = useUserStore();
 
@@ -189,4 +189,4 @@ const login = () => {
     );
 };
 
-export default login;
+export default Login;
