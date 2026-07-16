@@ -1,12 +1,11 @@
-export const forgotPasswordTemplate = (
-  name: string,
-  resetLink: string
-) => `
+import { env } from "../../config/env";
+
+export const passwordChangedTemplate = (name: string) => `
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8" />
-<title>Reset Password</title>
+<title>Password Changed</title>
 </head>
 
 <body style="margin:0;padding:40px;background:#f5f5f5;font-family:Arial,sans-serif;">
@@ -21,13 +20,27 @@ box-shadow:0 10px 30px rgba(0,0,0,.08);
 ">
 
 <!-- Header -->
-<div style="background:#ff7a00;padding:26px 32px;">
+<div style="background:#ff7a00;padding:24px 32px;">
 
 <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
 <tr>
 
-<td style="width:56px;font-size:40px;vertical-align:middle;">
-🔐
+<td style="width:60px;vertical-align:middle;">
+
+<div style="
+width:48px;
+height:48px;
+border-radius:50%;
+background:#ffffff;
+color:#22c55e;
+font-size:26px;
+font-weight:bold;
+line-height:48px;
+text-align:center;
+">
+✓
+</div>
+
 </td>
 
 <td style="vertical-align:middle;">
@@ -35,10 +48,10 @@ box-shadow:0 10px 30px rgba(0,0,0,.08);
 <h2 style="
 margin:0;
 color:#ffffff;
-font-size:28px;
+font-size:26px;
 font-weight:bold;
 ">
-Reset Password
+Password Changed
 </h2>
 
 <p style="
@@ -46,7 +59,7 @@ margin:6px 0 0;
 color:#fff4ea;
 font-size:15px;
 ">
-Secure your FastEat account.
+Your FastEat account is now secured.
 </p>
 
 </td>
@@ -64,30 +77,8 @@ Hi ${name},
 </p>
 
 <p style="color:#555;line-height:1.8;">
-We received a request to reset the password for your <strong>FastEat</strong> account.
+This email confirms that your FastEat account password has been changed successfully.
 </p>
-
-<p style="color:#555;line-height:1.8;">
-Click the button below to choose a new password.
-</p>
-
-<div style="text-align:center;margin:40px 0;">
-
-<a
-href="${resetLink}"
-style="
-background:#ff7a00;
-color:#ffffff;
-padding:14px 34px;
-text-decoration:none;
-border-radius:10px;
-font-weight:bold;
-display:inline-block;
-">
-Reset Password
-</a>
-
-</div>
 
 <div style="
 background:#fafafa;
@@ -103,7 +94,7 @@ font-size:16px;
 font-weight:bold;
 color:#222;
 ">
-Security Reminder
+Your account has been updated
 </p>
 
 <ul style="
@@ -112,9 +103,9 @@ padding-left:20px;
 color:#555;
 line-height:1.9;
 ">
-<li>This reset link expires in <strong>10 minutes</strong>.</li>
-<li>The link can only be used once.</li>
-<li>After resetting, sign in using your new password.</li>
+<li>Your previous password is no longer valid.</li>
+<li>Use your new password the next time you log in.</li>
+<li>No further action is needed if you made this change.</li>
 </ul>
 
 </div>
@@ -131,7 +122,7 @@ margin:0;
 font-weight:bold;
 color:#222;
 ">
-Didn't request this?
+Didn't make this change?
 </p>
 
 <p style="
@@ -139,15 +130,33 @@ margin:10px 0 0;
 color:#666;
 line-height:1.8;
 ">
-If you didn't request a password reset, simply ignore this email. Your account will remain secure.
+If you didn't change your password, reset it immediately and contact FastEat support. We'll help you secure your account.
 </p>
 
 </div>
 
-<p style="
-margin-top:35px;
-color:#222;
+<div style="text-align:center;margin:40px 0;">
+
+<a href="${env.CLIENT_URL}/login"
+style="
+background:#ff7a00;
+color:#ffffff;
+padding:14px 34px;
+text-decoration:none;
+border-radius:10px;
+font-weight:bold;
+display:inline-block;
 ">
+Login to FastEat
+</a>
+
+</div>
+
+<p style="color:#555;line-height:1.8;">
+Thanks for helping us keep your FastEat account secure.
+</p>
+
+<p style="margin-top:35px;color:#222;">
 ❤️ Team FastEat
 </p>
 
