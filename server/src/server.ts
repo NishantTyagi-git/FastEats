@@ -1,17 +1,22 @@
-import express from "express";
-import testRoute from "./routes/test.route";
+import app from "./app";
+import connectDB from "./config/db";
+import { env } from "./config/env";
 
-const app = express();
+const PORT = env.PORT ;
 
-app.get("/", (_, res) => {
-  res.json({
-    success: true,
-    message: "FastEats API Running 🚀",
-  });
-});
+const startServer = async () => {
+  try {
+    await connectDB();
 
-app.use("/api/test", testRoute);
+    app.listen(PORT, () => {
+      console.log(
+        `Server running on http://localhost:${PORT}`
+      );
+    });
+  } catch (error) {
+    console.error("Server failed to start:", error);
+    process.exit(1);
+  }
+};
 
-app.listen(5000, () => {
-  console.log("Server running on http://localhost:5000");
-});
+startServer();
