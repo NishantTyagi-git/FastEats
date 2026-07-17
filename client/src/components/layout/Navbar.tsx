@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Search, ShoppingCart, User } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState } from "react"
 
 import NavLinks from "./NavLinks";
 import MobileNav from "./MobileNav";
@@ -27,19 +27,16 @@ export default function Navbar() {
           : "bg-transparent"
       }`}
     >
-      <div className="mx-auto flex h-24 max-w-7xl items-center px-10 xl:px-4">
+      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-8">
 
         <div className="flex w-64 items-center">
-          <Link
-            href="/"
-            className="transition-transform duration-300 hover:scale-105"
-          >
+          <Link href="/" className="transition-transform duration-300 hover:scale-105">
             <Image
               src="/Logo.png"
               alt="FastEat"
-              width={210}
-              height={65}
-              className="h-16 w-auto"
+              width={170}
+              height={55}
+              className="h-14 w-auto"
               priority
             />
           </Link>
@@ -65,10 +62,7 @@ export default function Navbar() {
             </span>
           </button>
 
-          <Link
-            href="/login"
-            className="flex items-center gap-2 rounded-full bg-orange-500 px-8 py-2 font-semibold text-white transition-all duration-300 hover:scale-105 hover:bg-orange-600"
-          >
+          <Link href="/login" className="flex items-center gap-2 rounded-full bg-orange-500 px-8 py-2 font-semibold text-white transition-all duration-300 hover:scale-105 hover:bg-orange-600">
             <User size={18} />
             Login
           </Link>
