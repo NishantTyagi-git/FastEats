@@ -3,73 +3,73 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Search, ShoppingCart, User } from "lucide-react";
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "react";
 
 import NavLinks from "./NavLinks";
 import MobileNav from "./MobileNav";
 
 export default function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
+    const [scrolled, setScrolled] = useState(false);
 
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
+    useEffect(() => {
+        const handleScroll = () => { setScrolled(window.scrollY > 20); };
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
 
-    window.addEventListener("scroll", handleScroll);
+    return (
+        <header
+            className={`fixed inset-x-0 top-0 z-50 transition-[background-color,backdrop-filter,border-color,box-shadow] duration-500 ease-out ${
+                    scrolled
+                        ? "border-b border-white/10 bg-black/60 shadow-[0_8px_30px_rgba(0,0,0,.22)] backdrop-blur-xl"
+                        : "border-b border-transparent bg-gradient-to-b from-black/25 to-transparent"
+                }`}
+        >
+            <div className="mx-auto flex h-[72px] max-w-7xl items-center justify-between px-8">
 
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+                <div className="flex w-64 items-center">
+                    <Link href="/" className="transition-transform duration-300 hover:scale-105">
+                        <Image
+                            src="/Logo.png"
+                            alt="FastEat"
+                            width={170}
+                            height={55}
+                            className="h-14 w-auto"
+                            priority
+                        />
+                    </Link>
+                </div>
 
-  return (
-    <header
-      className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? "border-b border-white/10 bg-[#111111]/85 shadow-xl backdrop-blur-xl"
-          : "bg-transparent"
-      }`}
-    >
-      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-8">
+                <nav className="hidden flex-1 justify-center lg:flex">
+                    <div className="flex items-center gap-12">
+                        <NavLinks />
+                    </div>
+                </nav>
 
-        <div className="flex w-64 items-center">
-          <Link href="/" className="transition-transform duration-300 hover:scale-105">
-            <Image
-              src="/Logo.png"
-              alt="FastEat"
-              width={170}
-              height={55}
-              className="h-14 w-auto"
-              priority
-            />
-          </Link>
-        </div>
+                <div className="hidden w-60 items-center justify-end gap-8 lg:flex">
 
-        <nav className="hidden flex-1 justify-center lg:flex">
-          <div className="flex items-center gap-12">
-            <NavLinks />
-          </div>
-        </nav>
+                    <button className="text-white transition-all duration-300 hover:-translate-y-0.5 hover:text-orange-500">
+                        <Search size={24} strokeWidth={2} />
+                    </button>
 
-        <div className="hidden w-60 items-center justify-end gap-8 lg:flex">
+                    <button className="relative text-white transition-all duration-300 hover:-translate-y-0.5 hover:text-orange-500">
+                        <ShoppingCart size={24} strokeWidth={2} />
 
-          <button className="text-white transition-all duration-300 hover:-translate-y-0.5 hover:text-orange-500">
-            <Search size={26} strokeWidth={2} />
-          </button>
+                        <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-orange-500 text-[10px] font-semibold text-white">
+                            0
+                        </span>
+                    </button>
 
-          <button className="relative text-white transition-all duration-300 hover:-translate-y-0.5 hover:text-orange-500">
-            <ShoppingCart size={26} strokeWidth={2} />
+                    <Link href="/login" className="flex h-11 items-center gap-2 rounded-full bg-orange-500 px-6 font-semibold text-white transition-all duration-300 hover:scale-105 hover:bg-orange-600">
+                        <User size={17} />
+                        Login
+                    </Link>
 
-            <span className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-orange-500 text-[11px] font-semibold text-white">
-              0
-            </span>
-          </button>
+                </div>
 
-          <Link href="/login" className="flex items-center gap-2 rounded-full bg-orange-500 px-8 py-2 font-semibold text-white transition-all duration-300 hover:scale-105 hover:bg-orange-600">
-            <User size={18} />
-            Login
-          </Link>
-        </div>
+                <MobileNav />
 
-        <MobileNav />
-      </div>
-    </header>
-  );
+            </div>
+        </header>
+    );
 }
