@@ -1,7 +1,8 @@
 import Navbar from "@/components/layout/Navbar";
 import Hero from "@/components/home/Hero";
-import Features from "@/components/home/Features";
 import About from "@/components/home/About";
+import PopularDishes from "@/components/home/popular/PopularDishes";
+import Features from "@/components/home/Features";
 
 export default function Home() {
   return (
@@ -9,6 +10,7 @@ export default function Home() {
       <Navbar />
       <Hero />
       <About />
+      <PopularDishes />
       {/* <Features /> */}
     </div>
   );

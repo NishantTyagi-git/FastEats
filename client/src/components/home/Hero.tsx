@@ -8,7 +8,7 @@ export default function Hero() {
             <div
                 className="absolute inset-0 bg-cover bg-no-repeat"
                 style={{
-                    backgroundImage: "url('/hero12.png')",
+                    backgroundImage: "url('images/hero.png')",
                     backgroundPosition: "right center",
                     backgroundSize: "cover",
                     filter: "brightness(.95)",

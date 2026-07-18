@@ -47,7 +47,7 @@ export default function About() {
                         
                         <div className="relative overflow-hidden rounded-[32px] border border-white/10">
                             <Image
-                                src="/about-chef.png"
+                                src="/images/about-chef.png"
                                 alt="FastEat Chef"
                                 width={550}
                                 height={700}

@@ -30,7 +30,7 @@ export default function Navbar() {
                 <div className="flex w-64 items-center">
                     <Link href="/" className="transition-transform duration-300 hover:scale-105">
                         <Image
-                            src="/Logo.png"
+                            src="/images/Logo.png"
                             alt="FastEat"
                             width={170}
                             height={55}
