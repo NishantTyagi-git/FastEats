@@ -4,15 +4,17 @@ import About from "@/components/home/About";
 import PopularDishes from "@/components/home/popular/PopularDishes";
 import Offer from "@/components/home/Offer";
 import Features from "@/components/home/Features";
+import Testimonials from "@/components/home/testimonials/Testimonials";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-[#0d0d0d]">
+    <div className="min-h-screen bg-[#0b0b0b]">
       <Navbar />
       <Hero />
       <About />
       <PopularDishes />
       <Offer />
+      <Testimonials />
       {/* <Features /> */}
     </div>
   );
