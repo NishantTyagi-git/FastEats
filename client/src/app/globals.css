@@ -137,8 +137,31 @@ html, body {
   overflow-y: scroll;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+}
+
+input, textarea {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
+
+img {
+  -webkit-user-drag: none;
+  user-drag: none;
 }
 
 html::-webkit-scrollbar, body::-webkit-scrollbar {
   display: none;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
 }

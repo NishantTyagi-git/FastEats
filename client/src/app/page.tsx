@@ -2,6 +2,7 @@ import Navbar from "@/components/layout/Navbar";
 import Hero from "@/components/home/Hero";
 import About from "@/components/home/About";
 import PopularDishes from "@/components/home/popular/PopularDishes";
+import Offer from "@/components/home/Offer";
 import Features from "@/components/home/Features";
 
 export default function Home() {
@@ -11,6 +12,7 @@ export default function Home() {
       <Hero />
       <About />
       <PopularDishes />
+      <Offer />
       {/* <Features /> */}
     </div>
   );
