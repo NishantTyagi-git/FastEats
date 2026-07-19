@@ -9,7 +9,7 @@ type Props = {
 
 export default function ReviewCard({image, name, review}: Props) {
     return (
-        <article className="group relative mx-4 w-[390px] shrink-0 overflow-hidden rounded-[32px] border border-white/10 bg-white/[0.04] p-8 backdrop-blur-xl transition-all duration-500 hover:-translate-y-4 hover:border-orange-500/40 hover:shadow-[0_30px_80px_rgba(249,115,22,0.18)]">
+        <article className="group relative mx-4 w-[390px] shrink-0 overflow-hidden rounded-[32px] border border-white/10 bg-white/[0.04] p-8 backdrop-blur-xl transition-all duration-500 hover:-translate-y-4 hover:border-orange-500/40 hover:shadow-[0_0_40px_rgba(249,115,22,0.15)]">
             <div className="pointer-events-none absolute -right-28 -top-28 h-[320px] w-[320px] rounded-full bg-orange-500/15 blur-[140px] opacity-0 transition-all duration-700 group-hover:opacity-100" />
             
             <Quote

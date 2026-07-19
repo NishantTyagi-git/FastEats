@@ -2,7 +2,7 @@ import DishGrid from "./DishGrid";
 
 export default function PopularDishes() {
     return (
-        <section className="bg-[#0F0F0F] py-32">
+        <section className="bg-[#0b0b0b] py-20 lg:py-24">
             <div className="mx-auto max-w-7xl px-8">
                 <div className="mb-16 text-center">
                     <div className="mb-5 flex items-center justify-center gap-4">

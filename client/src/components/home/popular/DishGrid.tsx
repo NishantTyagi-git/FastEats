@@ -70,6 +70,14 @@ const dishes = [
         price: 149,
         rating: 4.9,
     },
+    {
+        image: "/images/dishes/masala-dosa.png",
+        title: "Masala Dosa",
+        category: "South Indian",
+        description: "Crispy dosa filled with spiced potato masala.",
+        price: 199,
+        rating: 4.8,
+    },
 ];
 
 export default function DishGrid() {

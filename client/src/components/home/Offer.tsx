@@ -3,7 +3,7 @@ import { ArrowRight } from "lucide-react";
 
 export default function Offer() {
     return (
-        <section className="py-28">
+        <section className="py-20 lg:py-24">
             <div className="mx-auto max-w-7xl px-8">
                 <div className="relative overflow-hidden rounded-[36px]">
                     <div

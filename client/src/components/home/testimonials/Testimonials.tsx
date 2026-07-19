@@ -32,7 +32,7 @@ const reviews = [
 
 export default function Testimonials() {
     return (
-        <section className="overflow-hidden bg-[#0b0b0b] py-32">
+        <section className="overflow-hidden bg-[#0b0b0b] py-20 lg:py-24">
             <div className="mx-auto mb-20 max-w-7xl px-8 text-center">
                 <p className="font-semibold uppercase tracking-[5px] text-orange-500">
                     Testimonials

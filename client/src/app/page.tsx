@@ -3,8 +3,11 @@ import Hero from "@/components/home/Hero";
 import About from "@/components/home/About";
 import PopularDishes from "@/components/home/popular/PopularDishes";
 import Offer from "@/components/home/Offer";
-import Features from "@/components/home/Features";
 import Testimonials from "@/components/home/testimonials/Testimonials";
+import Gallery from "@/components/home/gallery/Gallery";
+import CTA from "@/components/home/CTA";
+import Footer from "@/components/layout/Footer";
+import Features from "@/components/home/Features";
 
 export default function Home() {
   return (
@@ -15,6 +18,9 @@ export default function Home() {
       <PopularDishes />
       <Offer />
       <Testimonials />
+      <Gallery /> 
+      <CTA /> 
+      <Footer />
       {/* <Features /> */}
     </div>
   );

@@ -6,7 +6,7 @@ import Stats from "./Stats";
 
 export default function About() {
     return (
-        <section className="relative bg-[#111111] py-32 overflow-hidden">
+        <section className="relative bg-[#0b0b0b] py-20 lg:py-24 overflow-hidden">
             <div className="mx-auto flex max-w-7xl flex-col-reverse items-center gap-24 px-8 lg:flex-row">
                 <div className="flex-1">
                     <div>
