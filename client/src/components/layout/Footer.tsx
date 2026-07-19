@@ -33,7 +33,7 @@ export default function Footer() {
                 <div className="grid gap-16 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
                     <div>
                         <Image
-                            src="/Logo.png"
+                            src="/images/Logo.png"
                             alt="FastEat"
                             width={180}
                             height={60}
