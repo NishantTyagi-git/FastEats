@@ -3,12 +3,12 @@ import { ChevronLeft } from "lucide-react";
 import { notFound } from "next/navigation";
 
 import { dishes } from "@/data/Dishes";
-import DishGallery from "@/components/dish/DishGallery";
-import DishInfo from "@/components/dish/DishInfo";
-import Ingredients from "@/components/dish/Ingredients";
-import Nutrition from "@/components/dish/Nutrition";
-import ChefNote from "@/components/dish/ChefNote";
-import RelatedDishes from "@/components/dish/RelatedDishes";
+import DishGallery from "@/components/store/dish/DishGallery";
+import DishInfo from "@/components/store/dish/DishInfo";
+import Ingredients from "@/components/store/dish/Ingredients";
+import Nutrition from "@/components/store/dish/Nutrition";
+import ChefNote from "@/components/store/dish/ChefNote";
+import RelatedDishes from "@/components/store/dish/RelatedDishes";
 
 
 type Props = {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { dishes } from "../../data/Dishes";
+import { dishes } from "../../../data/Dishes";
 import DishGrid from "./DishGrid";
 import MenuSearch from "./Search";
 import CategoryTabs from "./Category";

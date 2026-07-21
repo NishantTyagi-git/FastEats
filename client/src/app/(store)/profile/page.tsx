@@ -1,7 +1,7 @@
-import ProfileHeader from "@/components/profile/ProfileHeader";
-import ProfileStats from "@/components/profile/ProfileStats";
-import ProfileMenu from "@/components/profile/ProfileMenu";
-import LogoutCard from "@/components/profile/LogoutCard";
+import ProfileHeader from "@/components/store/profile/ProfileHeader";
+import ProfileStats from "@/components/store/profile/ProfileStats";
+import ProfileMenu from "@/components/store/profile/ProfileMenu";
+import LogoutCard from "@/components/store/profile/LogoutCard";
 
 export default function ProfilePage() {
     return (

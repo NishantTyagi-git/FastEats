@@ -1,5 +1,5 @@
-import OrdersHeader from "@/components/orders/list/OrdersHeader";
-import OrdersTabs from "@/components/orders/list/OrdersTabs";
+import OrdersHeader from "@/components/store/orders/list/OrdersHeader";
+import OrdersTabs from "@/components/store/orders/list/OrdersTabs";
 
 export default function OrdersPage() {
     return (

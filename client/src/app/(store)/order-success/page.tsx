@@ -1,5 +1,5 @@
 import Link from "next/link";
-import SuccessHero from "@/components/order-success/SuccessHero";
+import SuccessHero from "@/components/store/order-success/SuccessHero";
 
 export default function OrderSuccessPage() {
     return (

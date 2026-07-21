@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
-import BillingForm from "@/components/checkout/BillingForm";
-import PaymentMethod from "@/components/checkout/PaymentMethod";
-import CheckoutSummary from "@/components/checkout/CheckoutSummary";
+import BillingForm from "@/components/store/checkout/BillingForm";
+import PaymentMethod from "@/components/store/checkout/PaymentMethod";
+import CheckoutSummary from "@/components/store/checkout/CheckoutSummary";
 
 export default function CheckoutPage() {
     return (

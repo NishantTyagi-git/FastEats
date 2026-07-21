@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
-import CartItem from "@/components/cart/CartItem";
-import CartSummary from "@/components/cart/CartSummary";
-import EmptyCart from "@/components/cart/EmptyCart";
+import CartItem from "@/components/store/cart/CartItem";
+import CartSummary from "@/components/store/cart/CartSummary";
+import EmptyCart from "@/components/store/cart/EmptyCart";
 import { cartItems } from "@/data/cart";
 
 export default function CartPage() {

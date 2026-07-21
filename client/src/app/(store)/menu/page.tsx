@@ -1,5 +1,5 @@
-import MenuHero from "@/components/menu/Hero";
-import Menu from "@/components/menu/Menu";
+import MenuHero from "@/components/store/menu/Hero";
+import Menu from "@/components/store/menu/Menu";
 
 export default function MenuPage() {
     return (
