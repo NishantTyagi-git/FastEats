@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
-import OrderHero from "@/components/orders/OrderHero";
-import OrderProgress from "@/components/orders/OrderProgress";
-import RiderCard from "@/components/orders/RiderCard";
-import DeliveryStatusCard from "@/components/orders/DeliveryStatusCard";
-import ReceiptAccordion from "@/components/orders/ReceiptAccordion";
+import OrderHero from "@/components/orders/details/OrderHero";
+import OrderProgress from "@/components/orders/details/OrderProgress";
+import RiderCard from "@/components/orders/details/RiderCard";
+import DeliveryStatusCard from "@/components/orders/details/DeliveryStatusCard";
+import ReceiptAccordion from "@/components/orders/details/ReceiptAccordion";
 
 type Props = {
     params: Promise<{
