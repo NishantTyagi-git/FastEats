@@ -76,7 +76,7 @@ export default function OrderProgress() {
                         <h3 className="mt-2 text-3xl font-black text-white">👨‍🍳 Preparing Your Meal</h3>
 
                         <p className="mt-3 max-w-xl leading-7 text-zinc-400">
-                            Our chefs are freshly preparing your order. We'll notify you as soon as the delivery partner picks it up.
+                            Our chefs are freshly preparing your order. We&apos;ll notify you as soon as the delivery partner picks it up.
                         </p>
                     </div>
 

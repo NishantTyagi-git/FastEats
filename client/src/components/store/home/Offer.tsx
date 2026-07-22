@@ -15,7 +15,7 @@ export default function Offer() {
                     <div className="relative z-10 grid items-center px-14 py-20 lg:grid-cols-2">
 
                         <div>
-                            <span className="rounded-full bg-white/20 px-5 py-2 text-sm font-semibold uppercase tracking-[4px] text-white">Today's Special</span>
+                            <span className="rounded-full bg-white/20 px-5 py-2 text-sm font-semibold uppercase tracking-[4px] text-white">Today&apos;s Special</span>
                             <h2 className="mt-8 text-5xl font-black text-white xl:text-7xl">30% OFF</h2>
 
                             <p className="mt-5 text-2xl font-semibold text-white">

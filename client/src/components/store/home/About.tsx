@@ -22,7 +22,7 @@ export default function About() {
                         </h2>
 
                         <p className="mt-8 max-w-xl text-lg leading-9 text-zinc-400">
-                            At FastEat, every dish tells a story. We bring together authentic Indian recipes, handpicked spices and fresh ingredients to create unforgettable flavours. Whether you're craving rich curries, sizzling tandoori platters or aromatic biryanis, every meal is prepared with passion and served with love.
+                            At FastEat, every dish tells a story. We bring together authentic Indian recipes, handpicked spices and fresh ingredients to create unforgettable flavours. Whether you&apos;re craving rich curries, sizzling tandoori platters or aromatic biryanis, every meal is prepared with passion and served with love.
                         </p>
 
                         <p className="mt-6 max-w-xl text-lg leading-9 text-zinc-400">

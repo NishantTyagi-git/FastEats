@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, ShoppingBag, UtensilsCrossed, Grid2X2, Users, TicketPercent, BarChart3, Settings, LogOut, } from "lucide-react";
+import { LayoutDashboard, ShoppingBag, UtensilsCrossed, Grid2X2, Users, TicketPercent, BarChart3, Settings } from "lucide-react";
 
 const links = [
     {

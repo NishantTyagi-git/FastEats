@@ -8,7 +8,7 @@ export default function DashboardHeader() {
 
                 <h1 className="mt-2 text-4xl font-black text-white">Welcome back, Nishant 👋</h1>
 
-                <p className="mt-2 text-zinc-500">Here's what's happening with your restaurant today.</p>
+                <p className="mt-2 text-zinc-500">Here&apos;s what&apos;s happening with your restaurant today.</p>
             </div>
 
             <div className="flex flex-wrap gap-4">

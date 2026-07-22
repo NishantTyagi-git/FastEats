@@ -49,7 +49,7 @@ export default function ReviewCard({image, name, review}: Props) {
             </div>
 
             <p className="relative mt-8 min-h-[110px] text-[17px] italic leading-8 text-zinc-300">
-                "{review}"
+                &quot;{review}&quot;
             </p>
 
             <div className="relative mt-8 flex items-center justify-between border-t border-white/10 pt-6">

@@ -16,7 +16,7 @@ export default function EmptyCart() {
                 <h1 className="mt-8 text-5xl font-black text-white">Your Cart is Empty</h1>
 
                 <p className="mx-auto mt-6 max-w-md text-lg leading-8 text-zinc-400">
-                    Looks like you haven't added anything yet. Explore our delicious menu and find your next favorite meal.
+                    Looks like you haven&apos;t added anything yet. Explore our delicious menu and find your next favorite meal.
                 </p>
 
                 <Link

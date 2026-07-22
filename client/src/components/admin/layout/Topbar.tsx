@@ -64,6 +64,8 @@ export default function Topbar() {
                         <img
                             src="/images/profile.png"
                             alt="Admin"
+                            width = {40}
+                            height = {40}
                             className="h-12 w-12 rounded-full object-cover"
                         />
 

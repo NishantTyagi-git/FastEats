@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
-import Navbar from "@/components/store/layout/Navbar";
-import Footer from "@/components/store/layout/Footer";
-
 export const metadata: Metadata = {
   title: {
     default: "FastEats",

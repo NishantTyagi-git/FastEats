@@ -27,7 +27,7 @@ export default function OrderHero({ orderId }: Props) {
                 <h1 className="mt-4 text-5xl font-black">Preparing Your Order</h1>
 
                 <p className="mt-5 max-w-2xl text-lg leading-8 text-zinc-400">
-                    Our chefs have started preparing your meal. We'll notify you once your order is picked up by the rider.
+                    Our chefs have started preparing your meal. We&apos;ll notify you once your order is picked up by the rider.
                 </p>
             </div>
 
