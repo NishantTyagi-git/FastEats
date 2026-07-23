@@ -1,195 +1,101 @@
 "use client";
 
-import { ChangeEvent, FormEvent, KeyboardEvent, useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Loader2, ShieldCheck } from "lucide-react";
-import {verifyEmailSchema,VerifyEmailInput} from "@/schemas/user.schema";
+import { ArrowLeft, Clock3 } from "lucide-react";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import { REGEXP_ONLY_DIGITS } from "input-otp";
+import { useState } from "react";
 
-// import { useUserStore } from "@/store/useUserStore";
-
-type VerifyEmailErrors = Partial<Record<keyof VerifyEmailInput, string[]>>;
-
-const VerifyEmail = () => {
-  const router = useRouter();
-
-  // const { loading, verifyEmail } = useUserStore();
-
-  const [loading, setLoading] = useState(false);
-
-  const [otp, setOtp] = useState(["","","","","",""]);
-
-  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-
-  const [validationErrors, setValidationErrors] = useState<VerifyEmailErrors>({});
-
-  const handleChange = (
-    index: number,
-    value: string
-  ) => {
-    // Only allow numbers
-    if (!/^\d?$/.test(value)) return;
-
-    const newOtp = [...otp];
-    newOtp[index] = value;
-
-    setOtp(newOtp);
-
-    // Clear previous validation error
-    setValidationErrors({});
-
-    // Move to next input
-    if (value && index < 5) {
-      inputRefs.current[index + 1]?.focus();
-    }
-  };
-
-  const handleKeyDown = (
-    index: number,
-    e: KeyboardEvent<HTMLInputElement>
-  ) => {
-    if (
-      e.key === "Backspace" &&
-      !otp[index] &&
-      index > 0
-    ) {
-      inputRefs.current[index - 1]?.focus();
-    }
-  };
-
-  const handlePaste = (
-    e: React.ClipboardEvent<HTMLInputElement>
-  ) => {
-    e.preventDefault();
-
-    const pasted = e.clipboardData
-      .getData("text")
-      .replace(/\D/g, "")
-      .slice(0, 6);
-
-    if (!pasted) return;
-
-    const newOtp = [...otp];
-
-    pasted.split("").forEach((digit, index) => {
-      newOtp[index] = digit;
-    });
-
-    setOtp(newOtp);
-
-    const nextIndex = Math.min(pasted.length, 5);
-    inputRefs.current[nextIndex]?.focus();
-  };
-
-  const submitHandler = async (
-    e: FormEvent<HTMLFormElement>
-  ) => {
-    e.preventDefault();
-
-    const verificationCode = otp.join("");
-
-    const result = verifyEmailSchema.safeParse({
-      otp: verificationCode,
-    });
-
-    if (!result.success) {
-      setValidationErrors(
-        result.error.flatten().fieldErrors
-      );
-      return;
-    }
-
-    // try {
-    //   setLoading(true);
-
-    //   // await verifyEmail(verificationCode);
-
-    //   router.push("/login");
-    // } catch (error) {
-    //   console.error(error);
-    // } finally {
-    //   setLoading(false);
-    // }
-  };
+export default function VerifyEmailPage() {
+  const [otp, setOtp] = useState("");
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#fafafa] px-6">
-      <div className="w-full max-w-lg rounded-3xl border bg-white p-10 shadow-lg">
-        <div className="mb-10 text-center">
-          <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-orange/10">
-            <ShieldCheck className="h-8 w-8 text-orange" />
-          </div>
+    <main className="h-screen overflow-hidden bg-[#090909]">
+      <div className="mx-auto flex min-h-screen max-w-[1700px]">
+        <section className="flex w-full items-center px-8 py-12 lg:w-[45%] lg:px-20">
+          <div className="mx-auto w-full max-w-[520px]">
+            <h1 className="mt-8 text-5xl font-bold leading-tight text-white">
+              Verify your<br /><span className="text-orange-500">Email Address</span>
+            </h1>
 
-          <h1 className="text-4xl font-bold">
-            Verify Email
-          </h1>
+            <p className="mt-6 text-lg leading-8 text-zinc-400">We've sent a verification code to</p>
 
-          <p className="mt-3 text-muted-foreground">
-            Enter the 6-digit verification code sent to your email address.
-          </p>
-        </div>
+            <p className="mt-2 break-all text-xl font-semibold text-white">nishanttyagi@gmail.com</p>
 
-        <form onSubmit={submitHandler} className="space-y-8">
-          <div className="flex justify-center gap-3">
-            {otp.map((digit, index) => (
-              <Input
-                key={index}
-                ref={(el) => {
-                  inputRefs.current[index] = el;
-                }}
-                type="text"
+            <p className="mt-3 text-lg text-zinc-400">Enter the 6-digit code below to continue securely.</p>
+
+            <div className="mx-auto w-full max-w-[520px] pt-8 pb-6">
+              <InputOTP
+                maxLength={6}
+                value={otp}
+                onChange={setOtp}
+                pattern={REGEXP_ONLY_DIGITS}
                 inputMode="numeric"
-                maxLength={1}
-                value={digit}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => handleChange(index, e.target.value)}
-                onKeyDown={(e) => handleKeyDown(index, e)}
-                onPaste={handlePaste}
-                className="h-14 w-14 rounded-xl text-center text-xl font-bold"
-              />
-            ))}
-          </div>
+                autoComplete="one-time-code"
+                containerClassName="w-full"
+              >
+                <InputOTPGroup className="w-full justify-between">
+                  {Array.from({ length: 6 }).map((_, index) => (
+                    <InputOTPSlot
+                      key={index}
+                      index={index}
+                    />
+                  ))}
+                </InputOTPGroup>
+              </InputOTP>
+            </div>
+            
+            <div className="mt-8 flex items-center justify-between">
+              <div className="flex items-center gap-2 text-zinc-400">
+                <Clock3 size={18} className="text-orange-500" />
 
-          {validationErrors.otp?.[0] && (
-            <p className="text-center text-sm text-red-500">
-              {validationErrors.otp[0]}
-            </p>
-          )}
+                <span>Code expires in</span>
 
-          <Button
-            type="submit"
-            disabled={loading}
-            className="h-14 w-full rounded-full text-base"
-          >
-            {loading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Verifying...
-              </>
-            ) : (
-              "Verify Email"
-            )}
-          </Button>
-        </form>
+                <span className="font-semibold text-orange-500">04:59</span>
+              </div>
 
-        <div className="mt-6 text-center">
-          <button type="button" className="text-sm font-semibold text-orange hover:underline">
-            Resend Code
-          </button>
-        </div>
+              <button className="text-sm font-medium text-orange-500 transition hover:text-orange-400">Resend Code</button>
+            </div>
 
-        <div className="mt-8 text-center">
-          <p className="text-sm text-muted-foreground">
-            Back to{" "}
-            <Link href="/login" className="font-semibold text-orange hover:underline">
-              Sign In
+            <button className="mt-8 flex h-14 w-full items-center justify-center rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 text-lg font-semibold text-white shadow-lg shadow-orange-500/20 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-orange-500/40 active:translate-y-0">
+              Verify Email
+            </button>
+
+            <div className="my-8 flex items-center gap-4">
+              <div className="h-px flex-1 bg-white/10" />
+
+              <span className="text-sm text-zinc-500">or</span>
+
+              <div className="h-px flex-1 bg-white/10" />
+            </div>
+
+            <Link href="/login" className="inline-flex items-center gap-2 text-zinc-400 transition hover:text-orange-500">
+              <ArrowLeft size={18} />
+              Back to Login
             </Link>
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-};
+          </div>
+        </section>
 
-export default VerifyEmail;
+        <section className="relative hidden lg:flex lg:w-[55%] items-center justify-center overflow-hidden bg-[#0d0d0d]">
+          <Image
+            src="/images/auth/verify.png"
+            alt="Verify Email Illustration"
+            fill
+            priority
+            sizes="55vw"
+            className="object-cover object-center"
+          />
+
+          <div className="absolute inset-0 bg-gradient-to-l from-transparent via-black/20 to-[#090909]" />
+
+          <div className="absolute top-20 right-24 h-72 w-72 rounded-full bg-orange-500/10 blur-[120px]" />
+
+          <div className="absolute bottom-20 left-20 h-64 w-64 rounded-full bg-orange-400/10 blur-[110px]" />
+
+          <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#090909] to-transparent" />
+        </section>
+      </div>
+    </main>
+  );
+}
