@@ -10,7 +10,7 @@ export default function LoginForm() {
     return (
         <>
             <div className="text-center">
-                <h1 className="text-4xl font-black text-white">Welcome Back 👋</h1>
+                <h1 className="text-4xl font-black tracking-tight text-white lg:text-5xl">Welcome Back</h1>
 
                 <p className="mt-3 text-zinc-400">Sign in to continue managing your restaurant.</p>
             </div>
