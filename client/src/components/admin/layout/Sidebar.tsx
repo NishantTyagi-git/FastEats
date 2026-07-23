@@ -26,14 +26,14 @@ const links = [
         icon: Grid2X2,
     },
     {
-        name: "Employees",
-        href: "/admin/employees",
-        icon: Users,
-    },
-    {
         name: "Customers",
         href: "/admin/customers",
         icon: UserRound,
+    },
+    {
+        name: "Employees",
+        href: "/admin/employees",
+        icon: Users,
     },
     {
         name: "Analytics",
