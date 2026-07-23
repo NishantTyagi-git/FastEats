@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, ShoppingBag, UtensilsCrossed, Grid2X2, Users, TicketPercent, BarChart3, Settings } from "lucide-react";
+import { LayoutDashboard, ShoppingBag, UtensilsCrossed, Grid2X2, Users, UserRound, BarChart3, Settings } from "lucide-react";
 
 const links = [
     {
@@ -26,14 +26,14 @@ const links = [
         icon: Grid2X2,
     },
     {
-        name: "Customers",
-        href: "/admin/customers",
+        name: "Employees",
+        href: "/admin/employees",
         icon: Users,
     },
     {
-        name: "Coupons",
-        href: "/admin/coupons",
-        icon: TicketPercent,
+        name: "Customers",
+        href: "/admin/customers",
+        icon: UserRound,
     },
     {
         name: "Analytics",
