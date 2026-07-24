@@ -3,19 +3,71 @@
 import Link from "next/link";
 import { Eye, EyeOff, Lock, Mail, User } from "lucide-react";
 import { useState } from "react";
+import { signupSchema } from "@/schemas/auth.schema";
 
 export default function SignupForm() {
     const [showPassword, setShowPassword] = useState(false);
 
+    const [formData, setFormData] = useState({
+        fullName: "",
+        email: "",
+        password: "",
+    });
+
+    const [errors, setErrors] = useState<{
+        fullName?: string;
+        email?: string;
+        password?: string;
+    }>({});
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+
+        setFormData((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+
+        if (errors[name as keyof typeof errors]) {
+            setErrors((prev) => ({
+                ...prev,
+                [name]: undefined,
+            }));
+        }
+    };
+
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        const result = signupSchema.safeParse(formData);
+
+        if (!result.success) {
+            const fieldErrors = result.error.flatten().fieldErrors;
+
+            setErrors({
+                fullName: fieldErrors.fullName?.[0],
+                email: fieldErrors.email?.[0],
+                password: fieldErrors.password?.[0],
+            });
+
+            return;
+        }
+
+        setErrors({});
+
+        console.log(result.data);
+
+    };
+
     return (
-        <form className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-4">
             <div className="text-center">
                 <h1 className="text-4xl font-black tracking-tight text-white lg:text-5xl">Create Account</h1>
 
                 <p className="mt-3 text-lg text-zinc-400">Join FastEats and start ordering your favorite meals.</p>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-2">
                 <div>
                     <label className="mb-2 block text-sm font-medium text-zinc-400">
                         Full Name
@@ -28,11 +80,17 @@ export default function SignupForm() {
                         />
 
                         <input
+                            name="fullName"
+                            value={formData.fullName}
+                            onChange={handleChange}
                             type="text"
                             placeholder="John Doe"
                             className="h-13 w-full rounded-xl border border-white/10 bg-[#111111] pl-14 pr-5 text-white outline-none transition placeholder:text-zinc-500 focus:border-orange-500"
                         />
+
                     </div>
+
+                    <p className="mt-2 min-h-[20px] text-sm text-red-500">{errors.fullName}</p>
                 </div>
 
                 <div>
@@ -47,11 +105,16 @@ export default function SignupForm() {
                         />
 
                         <input
+                            name="email"
+                            value={formData.email}
+                            onChange={handleChange}
                             type="email"
                             placeholder="john@example.com"
                             className="h-13 w-full rounded-xl border border-white/10 bg-[#111111] pl-14 pr-5 text-white outline-none transition placeholder:text-zinc-500 focus:border-orange-500"
                         />
+
                     </div>
+                    <p className="mt-2 min-h-[20px] text-sm text-red-500">{errors.email}</p>
                 </div>
 
                 <div>
@@ -66,10 +129,14 @@ export default function SignupForm() {
                         />
 
                         <input
+                            name="password"
+                            value={formData.password}
+                            onChange={handleChange}
                             type={showPassword ? "text" : "password"}
                             placeholder="••••••••"
                             className="h-13 w-full rounded-xl border border-white/10 bg-[#111111] pl-14 pr-14 text-white outline-none transition placeholder:text-zinc-500 focus:border-orange-500"
                         />
+
 
                         <button
                             type="button"
@@ -79,6 +146,8 @@ export default function SignupForm() {
                             {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                         </button>
                     </div>
+
+                    <p className="mt-2 min-h-[20px] text-sm text-red-500">{errors.password}</p>
                 </div>
             </div>
 

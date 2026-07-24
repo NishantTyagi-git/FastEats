@@ -8,6 +8,18 @@ import { REGEXP_ONLY_DIGITS } from "input-otp";
 
 export default function VerifyForm() {
   const [otp, setOtp] = useState("");
+  const [error, setError] = useState("");
+
+  const handleVerify = () => {
+    if (otp.length !== 6) {
+      setError("Please enter the complete 6-digit verification code.");
+      return;
+    }
+
+    setError("");
+
+    console.log("OTP:", otp);
+  };
 
   return (
     <div className="w-full max-w-[480px] px-10">
@@ -25,7 +37,10 @@ export default function VerifyForm() {
         <InputOTP
           maxLength={6}
           value={otp}
-          onChange={setOtp}
+          onChange={(value) => {
+            setOtp(value);
+            if (error) setError("");
+          }}
           pattern={REGEXP_ONLY_DIGITS}
           inputMode="numeric"
           autoComplete="one-time-code"
@@ -41,6 +56,8 @@ export default function VerifyForm() {
             ))}
           </InputOTPGroup>
         </InputOTP>
+
+        {error && (<p className="mt-3 text-sm font-medium text-red-500">{error}</p>)}
       </div>
 
       <div className="flex items-center justify-between">
@@ -60,7 +77,7 @@ export default function VerifyForm() {
         </button>
       </div>
 
-      <button className="mt-8 h-13 w-full rounded-xl bg-orange-500 text-base font-semibold text-white transition hover:bg-orange-600">
+      <button type="button" onClick={handleVerify} className="mt-8 h-13 w-full rounded-xl bg-orange-500 text-base font-semibold text-white transition hover:bg-orange-600">
         Verify Email
       </button>
 

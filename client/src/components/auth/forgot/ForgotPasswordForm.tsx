@@ -2,10 +2,56 @@
 
 import Link from "next/link";
 import { Mail, ArrowLeft } from "lucide-react";
+import { useState } from "react";
+import { forgotPasswordSchema } from "@/schemas/auth.schema";
 
 export default function ForgotPasswordForm() {
+    const [formData, setFormData] = useState({
+        email: "",
+    });
+
+    const [errors, setErrors] = useState<{
+        email?: string;
+    }>({});
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+
+        setFormData((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+
+        if (errors[name as keyof typeof errors]) {
+            setErrors((prev) => ({
+                ...prev,
+                [name]: undefined,
+            }));
+        }
+    };
+
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        const result = forgotPasswordSchema.safeParse(formData);
+
+        if (!result.success) {
+            const fieldErrors = result.error.flatten().fieldErrors;
+
+            setErrors({
+                email: fieldErrors.email?.[0],
+            });
+
+            return;
+        }
+
+        setErrors({});
+
+        console.log(result.data);
+    };
+
     return (
-        <form className="w-full max-w-[480px] px-10">
+        <form onSubmit={handleSubmit} className="w-full max-w-[480px] px-10">
             <div>
                 <h1 className="text-5xl font-black tracking-tight text-white">Forgot Password</h1>
 
@@ -24,11 +70,16 @@ export default function ForgotPasswordForm() {
                     />
 
                     <input
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
                         type="email"
                         placeholder="john@example.com"
                         className="h-14 w-full rounded-xl border border-white/10 bg-[#111111] pl-14 pr-5 text-white outline-none transition placeholder:text-zinc-500 focus:border-orange-500"
                     />
                 </div>
+
+                <p className="mt-2 min-h-[20px] text-sm text-red-500">{errors.email}</p>
             </div>
 
             <button type="submit" className="mt-10 h-14 w-full rounded-xl bg-orange-500 text-base font-semibold text-white transition hover:bg-orange-600">
