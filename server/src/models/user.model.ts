@@ -22,11 +22,11 @@ export interface IUser extends Document {
 
     isVerified: boolean;
 
-    emailVerificationOTP?: string;
-    emailVerificationOTPExpiry?: Date;
+    emailVerificationOTP?: string | null;
+    emailVerificationOTPExpiry?: Date | null;
 
-    passwordResetOTP?: string;
-    passwordResetOTPExpiry?: Date;
+    passwordResetOTP?: string | null;
+    passwordResetOTPExpiry?: Date | null;
 
     comparePassword(candidatePassword: string): Promise<boolean>;
 

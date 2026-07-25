@@ -65,3 +65,10 @@ export const resetPasswordSchema = z.object({
 });
 
 export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
+
+// Resend OTP
+export const resendVerificationSchema = z.object({
+    email: emailSchema,
+});
+
+export type ResendVerificationInput = z.infer<typeof resendVerificationSchema>;

@@ -1,158 +1,238 @@
 import { env } from "../../config/env";
 
-export const welcomeEmailTemplate = (name: string) => `
+export const welcomeEmailTemplate = (
+  name: string
+) => `
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
 <meta charset="UTF-8" />
-<title>Welcome to FastEat</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Welcome to FastEats</title>
 </head>
 
-<body style="margin:0;padding:40px;background:#f5f5f5;font-family:Arial,sans-serif;">
+<body style="
+margin:0;
+padding:50px 20px;
+background:#f5f5f5;
+font-family:Arial,Helvetica,sans-serif;
+">
 
 <div style="
-max-width:600px;
+max-width:620px;
 margin:auto;
-background:#ffffff;
-border-radius:16px;
+background:#161616;
+border-radius:24px;
 overflow:hidden;
-box-shadow:0 10px 30px rgba(0,0,0,.08);
+border:1px solid #262626;
+box-shadow:0 20px 60px rgba(0,0,0,.18);
 ">
 
-<!-- Header -->
-<div style="background:#ff7a00;padding:26px 32px;">
+<div style="
+padding:36px 42px;
+background:linear-gradient(135deg,#ff7a00,#ff9a2f);
+">
 
-<table width="100%" cellpadding="0" cellspacing="0" role="presentation">
-<tr>
+<div style="
+display:inline-block;
+padding:10px 18px;
+border-radius:999px;
+background:rgba(255,255,255,.18);
+color:#fff;
+font-size:14px;
+font-weight:600;
+margin-bottom:24px;
+">
+🍔 FastEats
+</div>
 
-<td style="width:56px;font-size:40px;vertical-align:middle;">
-🍔
-</td>
-
-<td style="vertical-align:middle;">
-
-<h2 style="
+<h1 style="
 margin:0;
+font-size:40px;
+font-weight:800;
 color:#ffffff;
-font-size:28px;
-font-weight:bold;
+line-height:1.15;
 ">
-Welcome to FastEat
-</h2>
+Welcome to FastEats
+</h1>
 
 <p style="
-margin:6px 0 0;
-color:#fff4ea;
-font-size:15px;
+margin:14px 0 0;
+font-size:16px;
+line-height:1.8;
+color:#fff4ec;
 ">
-Fresh food. Fast delivery.
+Your account has been verified successfully.
 </p>
-
-</td>
-
-</tr>
-</table>
 
 </div>
 
-<!-- Body -->
-<div style="padding:40px;">
+<div style="
+padding:42px;
+background:#161616;
+">
 
 <p style="
-font-size:18px;
-color:#222;
-margin-top:0;
+margin:0;
+font-size:22px;
+font-weight:700;
+color:#ffffff;
 ">
 Hi ${name},
 </p>
 
 <p style="
-color:#555;
-line-height:1.8;
+margin:22px 0 0;
+font-size:16px;
+line-height:1.9;
+color:#b3b3b3;
 ">
-Thank you for creating your <strong>FastEat</strong> account! We're excited to have you with us.
+Welcome to
+<strong style="color:#ffffff;">FastEats</strong>!
+Your email has been verified successfully and your account is now ready to use.
 </p>
 
 <p style="
-color:#555;
-line-height:1.8;
+margin:18px 0 0;
+font-size:16px;
+line-height:1.9;
+color:#b3b3b3;
 ">
-You can now explore our delicious menu, place orders in just a few clicks, and enjoy quick delivery from your favourite restaurant.
+You're all set to explore delicious meals, place orders, save delivery addresses and enjoy lightning-fast food delivery.
 </p>
 
 <div style="
-background:#fafafa;
-border:1px solid #ececec;
-border-radius:12px;
-padding:22px;
-margin:32px 0;
+margin:38px 0;
+padding:30px;
+background:#111111;
+border:1px solid #2b2b2b;
+border-radius:18px;
 ">
 
 <p style="
-margin:0 0 16px;
-font-size:16px;
-font-weight:bold;
-color:#222;
+margin:0 0 20px;
+font-size:18px;
+font-weight:700;
+color:#ffffff;
 ">
-What's next?
+🚀 What's Next?
 </p>
 
-<ul style="
-margin:0;
-padding-left:20px;
-color:#555;
-line-height:1.9;
-">
-<li>🍕 Browse our delicious menu.</li>
-<li>🛒 Add your favourite meals to your cart.</li>
-<li>🚚 Get your food delivered fast.</li>
-</ul>
+<table width="100%" cellpadding="0" cellspacing="0">
+
+<tr>
+<td style="padding:8px 0;color:#b3b3b3;">
+🍕 Browse our delicious menu
+</td>
+</tr>
+
+<tr>
+<td style="padding:8px 0;color:#b3b3b3;">
+🛒 Place your first order
+</td>
+</tr>
+
+<tr>
+<td style="padding:8px 0;color:#b3b3b3;">
+📍 Save delivery addresses
+</td>
+</tr>
+
+<tr>
+<td style="padding:8px 0;color:#b3b3b3;">
+🚚 Track your orders in real time
+</td>
+</tr>
+
+</table>
 
 </div>
 
-<div style="text-align:center;margin:40px 0;">
+<div style="
+text-align:center;
+margin:42px 0;
+">
 
 <a
-href="${env.CLIENT_URL}"
+href="${env.CLIENT_URL}/login"
 style="
+display:inline-block;
+padding:16px 38px;
 background:#ff7a00;
 color:#ffffff;
-padding:14px 34px;
 text-decoration:none;
-border-radius:10px;
-font-weight:bold;
-display:inline-block;
+border-radius:12px;
+font-size:16px;
+font-weight:700;
 ">
 Start Ordering
 </a>
 
 </div>
 
-<p style="
-color:#555;
-line-height:1.8;
+<div style="
+margin-top:10px;
+padding:22px;
+background:#111111;
+border-left:4px solid #ff7a00;
+border-radius:14px;
 ">
-We can't wait to serve you your next delicious meal.
+
+<p style="
+margin:0;
+font-size:16px;
+font-weight:700;
+color:#ffffff;
+">
+You're ready to go!
 </p>
 
 <p style="
-margin-top:35px;
-color:#222;
+margin:10px 0 0;
+font-size:15px;
+line-height:1.8;
+color:#9ca3af;
 ">
-❤️ Team FastEat
+Thank you for choosing FastEats. We can't wait to deliver your favorite meals right to your doorstep.
 </p>
 
 </div>
 
-<!-- Footer -->
-<div style="
-background:#fafafa;
-padding:18px;
-text-align:center;
-font-size:13px;
-color:#888;
+<p style="
+margin-top:42px;
+font-size:16px;
+font-weight:600;
+color:#ffffff;
 ">
-© ${new Date().getFullYear()} FastEat. All rights reserved.
+— Team FastEats
+</p>
+
+</div>
+
+<div style="
+padding:22px;
+background:#111111;
+border-top:1px solid #262626;
+text-align:center;
+">
+
+<p style="
+margin:0;
+font-size:13px;
+color:#8d8d8d;
+">
+© ${new Date().getFullYear()} FastEats. All rights reserved.
+</p>
+
+<p style="
+margin:8px 0 0;
+font-size:13px;
+color:#666;
+">
+Fast. Fresh. Delivered.
+</p>
+
 </div>
 
 </div>
