@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { signup, verifyEmail, resendVerificationOTP } from "../services/auth.service";
-import { signupSchema, verifyEmailSchema, resendVerificationSchema } from "../schemas/auth.schema";
+import { signup, verifyEmail, resendVerificationOTP, login, refreshToken, logout } from "../services/auth.service";
+import { signupSchema, verifyEmailSchema, resendVerificationSchema, loginSchema } from "../schemas/auth.schema";
 
 export const signupController = async (
     req: Request,
@@ -100,6 +100,117 @@ export const resendVerificationOTPController = async (
             success: true,
             message: "Verification code sent successfully.",
             data,
+        });
+    } catch (error) {
+        if (error instanceof Error) {
+            return res.status(400).json({
+                success: false,
+                message: error.message,
+            });
+        }
+
+        return res.status(500).json({
+            success: false,
+            message: "Internal Server Error",
+        });
+    }
+};
+
+export const loginController = async (
+    req: Request,
+    res: Response
+) => {
+    try {
+        const parsed = loginSchema.safeParse(req.body);
+
+        if (!parsed.success) {
+            return res.status(400).json({
+                success: false,
+                errors: parsed.error.flatten().fieldErrors,
+            });
+        }
+
+        const { email, password } = parsed.data;
+
+        const data = await login(email, password);
+
+        res.cookie("refreshToken", data.refreshToken, {
+            httpOnly: true,
+            secure: false,
+            sameSite: "lax",
+            maxAge: 14 * 24 * 60 * 60 * 1000,
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: "Login successful.",
+            data: {
+                user: data.user,
+                accessToken: data.accessToken,
+            },
+        });
+    } catch (error) {
+        if (error instanceof Error) {
+            return res.status(400).json({
+                success: false,
+                message: error.message,
+            });
+        }
+
+        return res.status(500).json({
+            success: false,
+            message: "Internal Server Error",
+        });
+    }
+};
+
+export const refreshTokenController = async (
+    req: Request,
+    res: Response
+) => {
+    try {
+        const token = req.cookies.refreshToken;
+
+        const data = await refreshToken(token);
+
+        res.cookie("refreshToken", data.refreshToken, {
+            httpOnly: true,
+            secure: false,
+            sameSite: "lax",
+            maxAge: 14 * 24 * 60 * 60 * 1000,
+        });
+
+        return res.status(200).json({
+            success: true,
+            accessToken: data.accessToken,
+        });
+    } catch (error) {
+        if (error instanceof Error) {
+            return res.status(401).json({
+                success: false,
+                message: error.message,
+            });
+        }
+
+        return res.status(500).json({
+            success: false,
+            message: "Internal Server Error",
+        });
+    }
+};
+
+export const logoutController = async (
+    req: Request,
+    res: Response
+) => {
+    try {
+        await logout(req.user!.userId);
+
+        res.clearCookie("refreshToken");
+
+        return res.status(200).json({
+            success: true,
+            message: "Logged out successfully.",
         });
     } catch (error) {
         if (error instanceof Error) {

@@ -1,6 +1,11 @@
 import { User } from "../models/user.model";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
+import { env } from "../config/env";
 import { generateOTP, generateOTPExpiry } from "../utils/generateOTP";
 import { sendVerificationEmail, sendWelcomeEmail } from "./email.service";
+import { generateAccessToken } from "../utils/generateAccessToken";
+import { generateRefreshToken } from "../utils/generateRefreshToken";
 
 
 export const signup = async (
@@ -125,5 +130,130 @@ export const resendVerificationOTP = async (email: string) => {
 
     return {
         message: "Verification code sent successfully.",
+    };
+};
+
+export const login = async (
+    email: string,
+    password: string
+) => {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+        throw new Error("Invalid email or password.");
+    }
+
+    const isPasswordValid = await user.comparePassword(password);
+
+    if (!isPasswordValid) {
+        throw new Error("Invalid email or password.");
+    }
+
+    if (!user.isVerified) {
+        throw new Error("Please verify your email before logging in.");
+    }
+
+    const accessToken = generateAccessToken({
+        userId: user._id.toString(),
+        role: user.role,
+    });
+
+    const refreshToken = generateRefreshToken({
+        userId: user._id.toString(),
+    });
+
+    user.hashedRefreshToken = await bcrypt.hash(refreshToken, 12);
+    user.lastLogin = new Date();
+
+    await user.save();
+
+    return {
+        user: {
+            id: user._id.toString(),
+            fullName: user.fullName,
+            email: user.email,
+            role: user.role,
+            profilePicture: user.profilePicture,
+            isVerified: user.isVerified,
+        },
+        accessToken,
+        refreshToken,
+    };
+};
+
+export const refreshToken = async (
+    token: string
+) => {
+    if (!token) {
+        throw new Error("Refresh token is required.");
+    }
+
+    let decoded: jwt.JwtPayload;
+
+    try {
+        decoded = jwt.verify(
+            token,
+            env.JWT_REFRESH_SECRET
+        ) as jwt.JwtPayload;
+    } catch {
+        throw new Error("Invalid or expired refresh token.");
+    }
+
+    const user = await User.findById(decoded.userId);
+
+    if (!user) {
+        throw new Error("User not found.");
+    }
+
+    if (!user.hashedRefreshToken) {
+        throw new Error("Refresh token is invalid.");
+    }
+
+    const isValid = await bcrypt.compare(
+        token,
+        user.hashedRefreshToken
+    );
+
+    if (!isValid) {
+        throw new Error("Refresh token is invalid.");
+    }
+
+    const newAccessToken = generateAccessToken({
+        userId: user._id.toString(),
+        role: user.role,
+    });
+
+    const newRefreshToken = generateRefreshToken({
+        userId: user._id.toString(),
+    });
+
+    user.hashedRefreshToken = await bcrypt.hash(
+        newRefreshToken,
+        12
+    );
+
+    await user.save();
+
+    return {
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken,
+    };
+};
+
+export const logout = async (
+    userId: string
+) => {
+    const user = await User.findById(userId);
+
+    if (!user) {
+        throw new Error("User not found.");
+    }
+
+    user.hashedRefreshToken = null;
+
+    await user.save();
+
+    return {
+        message: "Logged out successfully.",
     };
 };

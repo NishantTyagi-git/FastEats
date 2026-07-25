@@ -28,6 +28,8 @@ export interface IUser extends Document {
     passwordResetOTP?: string | null;
     passwordResetOTPExpiry?: Date | null;
 
+    hashedRefreshToken?: string | null;
+
     comparePassword(candidatePassword: string): Promise<boolean>;
 
     createdAt: Date;
@@ -115,6 +117,11 @@ const userSchema = new Schema<IUser>(
 
         passwordResetOTPExpiry: {
             type: Date,
+            default: null,
+        },
+
+        hashedRefreshToken: {
+            type: String,
             default: null,
         },
     },
