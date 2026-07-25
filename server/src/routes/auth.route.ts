@@ -11,4 +11,5 @@ router.post("/login", loginController);
 router.post("/refresh-token", refreshTokenController);
 router.post("/logout", protect, logoutController);
 
+
 export default router;
