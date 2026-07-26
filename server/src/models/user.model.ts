@@ -6,15 +6,15 @@ export interface IUser extends Document {
     email: string;
     password: string;
 
-    contact?: string;
+    contact: string;
 
-    address?: {
-        street?: string;
-        city?: string;
-        country?: string;
+    address: {
+        street: string;
+        city: string;
+        country: string;
     };
 
-    profilePicture?: string;
+    profilePicture: string;
 
     role: "user" | "admin";
 
