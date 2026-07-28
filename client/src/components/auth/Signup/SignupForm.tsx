@@ -3,10 +3,16 @@
 import Link from "next/link";
 import { Eye, EyeOff, Lock, Mail, User } from "lucide-react";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { signupSchema } from "@/schemas/auth.schema";
+import { signupUser } from "@/services/auth.service";
 
 export default function SignupForm() {
+    const router = useRouter();
+
     const [showPassword, setShowPassword] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [acceptedToc, setAcceptedToc] = useState(false);
 
     const [formData, setFormData] = useState({
         fullName: "",
@@ -18,9 +24,12 @@ export default function SignupForm() {
         fullName?: string;
         email?: string;
         password?: string;
+        general?: string;
     }>({});
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (
+        e: React.ChangeEvent<HTMLInputElement>
+    ) => {
         const { name, value } = e.target;
 
         setFormData((prev) => ({
@@ -36,8 +45,20 @@ export default function SignupForm() {
         }
     };
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (
+        e: React.FormEvent<HTMLFormElement>
+    ) => {
         e.preventDefault();
+
+        if (isLoading) return;
+
+        if (!acceptedToc) {
+            setErrors({
+                general: "Please accept the Terms & Conditions before continuing.",
+            });
+
+            return;
+        }
 
         const result = signupSchema.safeParse(formData);
 
@@ -54,9 +75,30 @@ export default function SignupForm() {
         }
 
         setErrors({});
+        setIsLoading(true);
 
-        console.log(result.data);
+        try {
+            const response = await signupUser(result.data);
 
+            console.log("Signup successful:", response);
+
+            router.push(
+                `/verifyemail?email=${encodeURIComponent(
+                    result.data.email
+                )}`
+            );
+        } catch (error) {
+            const message =
+                error instanceof Error
+                    ? error.message
+                    : "Something went wrong. Please try again.";
+
+            setErrors({
+                general: message,
+            });
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -87,7 +129,6 @@ export default function SignupForm() {
                             placeholder="John Doe"
                             className="h-13 w-full rounded-xl border border-white/10 bg-[#111111] pl-14 pr-5 text-white outline-none transition placeholder:text-zinc-500 focus:border-orange-500"
                         />
-
                     </div>
 
                     <p className="mt-2 min-h-[20px] text-sm text-red-500">{errors.fullName}</p>
@@ -112,8 +153,8 @@ export default function SignupForm() {
                             placeholder="john@example.com"
                             className="h-13 w-full rounded-xl border border-white/10 bg-[#111111] pl-14 pr-5 text-white outline-none transition placeholder:text-zinc-500 focus:border-orange-500"
                         />
-
                     </div>
+
                     <p className="mt-2 min-h-[20px] text-sm text-red-500">{errors.email}</p>
                 </div>
 
@@ -137,13 +178,16 @@ export default function SignupForm() {
                             className="h-13 w-full rounded-xl border border-white/10 bg-[#111111] pl-14 pr-14 text-white outline-none transition placeholder:text-zinc-500 focus:border-orange-500"
                         />
 
-
                         <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
                             className="absolute right-5 top-1/2 -translate-y-1/2 text-zinc-500 transition hover:text-orange-500"
                         >
-                            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                            {showPassword ? (
+                                <EyeOff size={20} />
+                            ) : (
+                                <Eye size={20} />
+                            )}
                         </button>
                     </div>
 
@@ -154,6 +198,17 @@ export default function SignupForm() {
             <label className="flex cursor-pointer items-center gap-3 text-sm">
                 <input
                     type="checkbox"
+                    checked={acceptedToc}
+                    onChange={(e) => {
+                        setAcceptedToc(e.target.checked);
+
+                        if (e.target.checked) {
+                            setErrors((prev) => ({
+                                ...prev,
+                                general: undefined,
+                            }));
+                        }
+                    }}
                     className="h-5 w-5 rounded border-white/20 accent-orange-500"
                 />
 
@@ -165,14 +220,27 @@ export default function SignupForm() {
                 </span>
             </label>
 
-            <button type="submit" className="h-13 w-full rounded-xl bg-orange-500 text-base font-semibold text-white transition hover:bg-orange-600">
-                Create Account
+            {errors.general && (
+                <p className="mt-1 text-sm text-red-500">{errors.general}</p>
+            )}
+
+            <button type="submit" disabled={isLoading} className="h-13 w-full rounded-xl bg-orange-500 text-base font-semibold text-white transition-all duration-150 hover:bg-orange-600 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100">
+                {isLoading ? (
+                    <span className="flex items-center justify-center gap-2">
+                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                        Creating Account...
+                    </span>
+                ) : (
+                    "Create Account"
+                )}
             </button>
 
             <div className="flex items-center gap-4">
                 <div className="h-px flex-1 bg-white/10" />
 
-                <span className="text-sm text-zinc-500">or continue with</span>
+                <span className="text-sm text-zinc-500">
+                    or continue with
+                </span>
 
                 <div className="h-px flex-1 bg-white/10" />
             </div>

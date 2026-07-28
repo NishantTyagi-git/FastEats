@@ -6,6 +6,7 @@ import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 import { loginSchema } from "@/schemas/auth.schema";
 
 export default function LoginForm() {
+    const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
     const [formData, setFormData] = useState({
@@ -34,7 +35,8 @@ export default function LoginForm() {
         }
     };
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         const result = loginSchema.safeParse(formData);
@@ -51,8 +53,47 @@ export default function LoginForm() {
         }
 
         setErrors({});
+        setIsLoading(true);
 
-        console.log(result.data);
+        try {
+            const response = await fetch(
+                "http://localhost:5000/api/auth/login",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    credentials: "include",
+                    body: JSON.stringify(result.data),
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.message || "Login failed."
+                );
+            }
+
+            console.log("Login successful:", data);
+
+            localStorage.setItem(
+                "accessToken",
+                data.data.accessToken
+            );
+
+            window.location.href = "/";
+        } catch (error) {
+            setErrors({
+                password:
+                    error instanceof Error
+                        ? error.message
+                        : "Something went wrong. Please try again.",
+            });
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -134,8 +175,15 @@ export default function LoginForm() {
                     </Link>
                 </div>
 
-                <button type="submit" className="inline-flex h-14 w-full items-center justify-center rounded-2xl bg-orange-500 font-semibold text-white transition hover:bg-orange-600">
-                    Login
+                <button type="submit" disabled={isLoading} className="inline-flex h-14 w-full items-center justify-center rounded-2xl bg-orange-500 font-semibold text-white transition-all duration-150 hover:bg-orange-600 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60">
+                    {isLoading ? (
+                        <span className="flex items-center gap-2">
+                            <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                            Logging in...
+                        </span>
+                    ) : (
+                        "Login"
+                    )}
                 </button>
 
                 <div className="relative py-2">
