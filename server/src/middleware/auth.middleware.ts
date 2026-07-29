@@ -20,22 +20,30 @@ export const protect = (
     res: Response,
     next: NextFunction
 ) => {
+    let token: string | undefined;
+
     const authHeader = req.headers.authorization;
 
-    if (!authHeader?.startsWith("Bearer ")) {
+    if (authHeader?.startsWith("Bearer ")) {
+        token = authHeader.split(" ")[1];
+    }
+
+    if (!token) {
+        token = req.cookies?.accessToken;
+    }
+
+    if (!token) {
         return res.status(401).json({
             success: false,
             message: "Unauthorized",
         });
     }
 
-    const token = authHeader.split(" ")[1];
-
     try {
         const decoded = jwt.verify(
-            token!,
+            token,
             env.JWT_ACCESS_SECRET
-        ) as unknown as JwtUserPayload;
+        ) as JwtUserPayload;
 
         req.user = decoded;
 

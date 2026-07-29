@@ -24,7 +24,7 @@ interface AuthContextType {
     user: User | null;
     isLoading: boolean;
     refreshUser: () => Promise<void>;
-    logout: () => void;
+    logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -36,25 +36,33 @@ export function AuthProvider({ children }: {
     const [isLoading, setIsLoading] = useState(true);
 
     const refreshUser = async () => {
-        const accessToken = localStorage.getItem("accessToken");
-
-        if (!accessToken) {
-            setUser(null);
-            return;
-        }
-
         try {
-            const response = await fetch(
+            let response = await fetch(
                 "http://localhost:5000/api/users/me",
                 {
                     method: "GET",
-                    headers: { Authorization: `Bearer ${accessToken}` },
                     credentials: "include",
                 }
             );
 
+            if (response.status === 401) {
+                const refreshed = await refreshAccessToken();
+
+                if (!refreshed) {
+                    setUser(null);
+                    return;
+                }
+
+                response = await fetch(
+                    "http://localhost:5000/api/users/me",
+                    {
+                        method: "GET",
+                        credentials: "include",
+                    }
+                );
+            }
+
             if (!response.ok) {
-                localStorage.removeItem("accessToken");
                 setUser(null);
                 return;
             }
@@ -80,9 +88,51 @@ export function AuthProvider({ children }: {
         loadUser();
     }, []);
 
-    const logout = () => {
-        localStorage.removeItem("accessToken");
-        setUser(null);
+    const logout = async () => {
+        try {
+            const response = await fetch(
+                "http://localhost:5000/api/auth/logout",
+                {
+                    method: "POST",
+                    credentials: "include",
+                }
+            );
+
+            if (!response.ok) {
+                const data = await response.json();
+
+                throw new Error(
+                    data.message || "Logout failed."
+                );
+            }
+
+            setUser(null);
+
+            window.location.href = "/login";
+        } catch (error) {
+            console.error("Logout failed:", error);
+        }
+    };
+
+    const refreshAccessToken = async (): Promise<boolean> => {
+        try {
+            const response = await fetch(
+                "http://localhost:5000/api/auth/refresh-token",
+                {
+                    method: "POST",
+                    credentials: "include",
+                }
+            );
+
+            if (!response.ok) {
+                return false;
+            }
+
+            return true;
+        } catch (error) {
+            console.error("Failed to refresh access token:", error);
+            return false;
+        }
     };
 
     return (

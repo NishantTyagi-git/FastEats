@@ -76,32 +76,9 @@ export default function LoginForm() {
                 );
             }
 
-            const accessToken = data.data.accessToken;
+            const user = data.data.user;
 
-            localStorage.setItem("accessToken", accessToken);
-
-            const meResponse = await fetch(
-                "http://localhost:5000/api/users/me",
-                {
-                    method: "GET",
-                    headers: {
-                        Authorization: `Bearer ${accessToken}`,
-                    },
-                    credentials: "include",
-                }
-            );
-
-            const meData = await meResponse.json();
-
-            if (!meResponse.ok) {
-                throw new Error(
-                    meData.message || "Failed to fetch user profile."
-                );
-            }
-
-            const role = meData.data.role;
-
-            if (role === "admin") {
+            if (user.role === "admin") {
                 window.location.href = "/admin";
             } else {
                 window.location.href = "/";

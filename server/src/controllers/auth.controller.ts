@@ -134,6 +134,13 @@ export const loginController = async (
 
         const data = await login(email, password);
 
+        res.cookie("accessToken", data.accessToken, {
+            httpOnly: true,
+            secure: false,
+            sameSite: "lax",
+            maxAge: 15 * 60 * 1000,
+        });
+
         res.cookie("refreshToken", data.refreshToken, {
             httpOnly: true,
             secure: false,
@@ -173,6 +180,13 @@ export const refreshTokenController = async (
 
         const data = await refreshToken(token);
 
+        res.cookie("accessToken", data.accessToken, {
+            httpOnly: true,
+            secure: false,
+            sameSite: "lax",
+            maxAge: 15 * 60 * 1000,
+        });
+
         res.cookie("refreshToken", data.refreshToken, {
             httpOnly: true,
             secure: false,
@@ -206,6 +220,7 @@ export const logoutController = async (
     try {
         await logout(req.user!.userId);
 
+        res.clearCookie("accessToken");
         res.clearCookie("refreshToken");
 
         return res.status(200).json({
