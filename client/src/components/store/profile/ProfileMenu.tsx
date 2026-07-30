@@ -28,7 +28,7 @@ const menuItems = [
         bg: "bg-violet-500/10",
     },
     {
-        href: "/profile/orders",
+        href: "/orders",
         icon: Package,
         title: "My Orders",
         subtitle: "Track and reorder previous meals",
