@@ -9,6 +9,7 @@ import { usePathname } from "next/navigation";
 import NavLinks from "./NavLinks";
 import MobileNav from "./MobileNav";
 import { useAuth } from "@/context/AuthContext";
+import { useCart } from "@/context/CartContext";
 
 export default function Navbar() {
     const [scrolled, setScrolled] = useState(false);
@@ -18,19 +19,16 @@ export default function Navbar() {
     const profileRef = useRef<HTMLDivElement>(null);
 
     const { user, isLoading, logout } = useAuth();
+    const { cartCount } = useCart();
 
     const isHome = pathname === "/";
 
     useEffect(() => {
-        const handleScroll = () => {
-            setScrolled(window.scrollY > 20);
-        };
+        const handleScroll = () => { setScrolled(window.scrollY > 20); };
 
         window.addEventListener("scroll", handleScroll);
 
-        return () => {
-            window.removeEventListener("scroll", handleScroll);
-        };
+        return () => { window.removeEventListener("scroll", handleScroll); };
     }, []);
 
     useEffect(() => {
@@ -65,7 +63,6 @@ export default function Navbar() {
                 }`}
         >
             <div className="mx-auto flex h-[72px] max-w-7xl items-center justify-between px-8">
-
                 <div className="flex w-64 items-center">
                     <Link href="/" className="transition-transform duration-300 hover:scale-105">
                         <Image
@@ -90,11 +87,15 @@ export default function Navbar() {
                         <Search size={24} />
                     </button>
 
-                    <button type="button" className="relative text-white transition-all duration-300 hover:-translate-y-0.5 hover:text-orange-500">
+                    <Link href="/cart" className="relative text-white transition-all duration-300 hover:-translate-y-0.5 hover:text-orange-500">
                         <ShoppingCart size={24} />
 
-                        <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-orange-500 text-[10px] font-semibold text-white">0</span>
-                    </button>
+                        {cartCount > 0 && (
+                            <span className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-orange-500 px-1 text-[10px] font-semibold text-white">
+                                {cartCount > 99 ? "99+" : cartCount}
+                            </span>
+                        )}
+                    </Link>
 
                     {!isLoading &&
                         (user ? (
