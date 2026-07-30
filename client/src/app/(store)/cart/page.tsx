@@ -15,37 +15,35 @@ export default function CartPage() {
     const [cart, setCart] = useState<Cart | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
-    useEffect(() => {
-        const fetchCart = async () => {
-            try {
-                const response = await fetch(`${API_URL}/api/cart`, {
-                    credentials: "include",
-                    cache: "no-store",
-                });
+    const fetchCart = async () => {
+        try {
+            const response = await fetch(`${API_URL}/api/cart`, {
+                credentials: "include",
+                cache: "no-store",
+            });
 
-                if (!response.ok) {
-                    setCart(null);
-                    return;
-                }
-
-                const result = await response.json();
-
-                if (!result.success || !result.data) {
-                    setCart(null);
-                    return;
-                }
-
-                setCart(result.data);
-            } catch (error) {
-                console.error("Failed to fetch cart:", error);
+            if (!response.ok) {
                 setCart(null);
-            } finally {
-                setIsLoading(false);
+                return;
             }
-        };
 
-        fetchCart();
-    }, []);
+            const result = await response.json();
+
+            if (!result.success || !result.data) {
+                setCart(null);
+                return;
+            }
+
+            setCart(result.data);
+        } catch (error) {
+            console.error("Failed to fetch cart:", error);
+            setCart(null);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => { fetchCart(); }, []);
 
     if (isLoading) {
         return (
@@ -82,9 +80,9 @@ export default function CartPage() {
                     </span>
                 </div>
 
-                <div className="mt-16 grid gap-10 xl:grid-cols-[2fr_1fr]">
+                <div className="mt-16 grid items-start gap-10 xl:grid-cols-[2fr_1fr]">
                     <div className="space-y-8">
-                        {cart.items.map((item) => (<CartItem key={item.dishId._id} item={item} />))}
+                        {cart.items.map((item) => (<CartItem key={item.dishId._id} item={item} onChange={fetchCart} />))}
                     </div>
 
                     <CartSummary subtotal={subtotal} />

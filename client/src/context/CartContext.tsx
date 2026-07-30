@@ -2,16 +2,9 @@
 
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 
+import type { Cart } from "@/types/cart";
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
-type CartItem = {
-    quantity: number;
-    dishId: string;
-};
-
-type Cart = {
-    items: CartItem[];
-};
 
 type CartContextType = {
     cart: Cart | null;
@@ -77,9 +70,7 @@ export function CartProvider({
                     `${API_URL}/api/cart`,
                     {
                         method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
+                        headers: {"Content-Type": "application/json",},
                         credentials: "include",
                         body: JSON.stringify({
                             dishId,
@@ -91,10 +82,7 @@ export function CartProvider({
                 const result = await response.json();
 
                 if (!response.ok || !result.success) {
-                    throw new Error(
-                        result.message ||
-                        "Failed to add item to cart."
-                    );
+                    throw new Error(result.message ||"Failed to add item to cart.");
                 }
 
                 const updatedCart: Cart = result.data;
@@ -116,7 +104,7 @@ export function CartProvider({
     }, [refreshCart]);
 
     return (
-        <CartContext.Provider value={{ cart, cartCount, isLoading, refreshCart, addToCart }}>
+        <CartContext.Provider value={{cart,cartCount,isLoading,refreshCart,addToCart}}>
             {children}
         </CartContext.Provider>
     );
@@ -126,9 +114,7 @@ export function useCart() {
     const context = useContext(CartContext);
 
     if (!context) {
-        throw new Error(
-            "useCart must be used inside CartProvider"
-        );
+        throw new Error("useCart must be used inside CartProvider");
     }
 
     return context;
