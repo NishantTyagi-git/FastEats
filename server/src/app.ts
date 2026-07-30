@@ -1,8 +1,9 @@
 import express from "express";
-import authRoute from "./routes/auth.route";
-import userRoutes from "./routes/user.routes";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import authRoute from "./routes/auth.route";
+import userRoutes from "./routes/user.routes";
+import dishRoutes from "./routes/dish.routes";
 
 const app = express();
 
@@ -26,5 +27,6 @@ app.use(cookieParser());
 
 app.use("/api/auth", authRoute);
 app.use("/api/users", userRoutes);
+app.use("/api/dishes", dishRoutes);
 
 export default app;
