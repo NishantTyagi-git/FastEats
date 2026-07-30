@@ -1,20 +1,13 @@
 "use client";
 
-const categories = [
-    "All",
-    "North Indian",
-    "South Indian",
-    "Biryani",
-    "Chinese",
-    "Desserts",
-];
-
 type Props = {
+    categories: string[];
     selected: string;
     onSelect: (category: string) => void;
 };
 
 export default function CategoryTabs({
+    categories,
     selected,
     onSelect,
 }: Props) {
@@ -23,6 +16,7 @@ export default function CategoryTabs({
             {categories.map((category) => (
                 <button
                     key={category}
+                    type="button"
                     onClick={() => onSelect(category)}
                     className={`rounded-full px-7 py-3 text-sm font-semibold transition-all duration-300 ${selected === category
                             ? "bg-orange-500 text-white"

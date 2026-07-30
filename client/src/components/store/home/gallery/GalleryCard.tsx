@@ -1,17 +1,32 @@
 import Image from "next/image";
+import Link from "next/link";
 import clsx from "clsx";
 import { ArrowUpRight } from "lucide-react";
 
 type Props = {
+    slug: string;
     image: string;
     title: string;
     category: string;
     large?: boolean;
 };
 
-export default function GalleryCard({image, title, category, large = false}: Props) {
+export default function GalleryCard({
+    slug,
+    image,
+    title,
+    category,
+    large = false,
+}: Props) {
     return (
-        <div className={clsx("group relative overflow-hidden rounded-[30px]", large && "xl:col-span-2 xl:row-span-2")}>
+        <Link
+            href={`/menu/${slug}`}
+            className={clsx(
+                "group relative overflow-hidden rounded-[30px]",
+                large &&
+                "xl:col-span-2 xl:row-span-2"
+            )}
+        >
             <Image
                 src={image}
                 alt={title}
@@ -29,11 +44,9 @@ export default function GalleryCard({image, title, category, large = false}: Pro
                 </span>
 
                 <div className="mt-4 flex items-end justify-between">
-                    <div>
-                        <h3 className="text-3xl font-black text-white">{title}</h3>
-                    </div>
+                    <h3 className="text-3xl font-black text-white">{title}</h3>
 
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-orange-500 transition duration-300 group-hover:rotate-45">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-orange-500 transition duration-300 group-hover:rotate-45">
                         <ArrowUpRight
                             size={20}
                             className="text-white"
@@ -41,6 +54,6 @@ export default function GalleryCard({image, title, category, large = false}: Pro
                     </div>
                 </div>
             </div>
-        </div>
+        </Link>
     );
 }

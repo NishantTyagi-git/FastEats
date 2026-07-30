@@ -118,3 +118,33 @@ export const getCategories = async (
         });
     }
 };
+
+export const getPopularDishes = async (
+    req: Request,
+    res: Response
+) => {
+    try {
+        const dishes = await Dish.find({
+            isAvailable: true,
+            bestseller: true,
+        })
+            .sort({
+                rating: -1,
+                reviews: -1,
+            })
+            .limit(8);
+
+        return res.status(200).json({
+            success: true,
+            count: dishes.length,
+            data: dishes,
+        });
+    } catch (error) {
+        console.error("Failed to fetch popular dishes:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Failed to fetch popular dishes.",
+        });
+    }
+};

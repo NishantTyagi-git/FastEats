@@ -1,22 +1,18 @@
 import Image from "next/image";
 import { Heart, Plus, Star } from "lucide-react";
+import type { Dish } from "@/types/dish";
 
 type Props = {
-    image: string;
-    title: string;
-    description: string;
-    price: number;
-    rating: number;
+    dish: Dish;
 };
 
-export default function DishCard({image, title, description, price, rating}: Props) {
+export default function DishCard({ dish }: Props) {
     return (
         <article className="group overflow-hidden rounded-[28px] border border-white/10 bg-[#181818] transition-all duration-500 hover:-translate-y-2 hover:border-orange-500/30 hover:shadow-[0_25px_50px_rgba(0,0,0,.35)]">
             <div className="relative overflow-hidden">
-
                 <Image
-                    src={image}
-                    alt={title}
+                    src={dish.images[0]}
+                    alt={dish.title}
                     width={500}
                     height={350}
                     className="h-72 w-full object-cover transition duration-700 group-hover:scale-110"
@@ -33,16 +29,16 @@ export default function DishCard({image, title, description, price, rating}: Pro
             <div className="p-7">
                 <div className="mb-4 flex items-center justify-between">
                     <h3 className="text-2xl font-bold text-white">
-                        {title}
+                        {dish.title}
                     </h3>
 
                     <span className="text-2xl font-black text-orange-500">
-                        ₹{price}
+                        ₹{dish.price}
                     </span>
                 </div>
 
                 <p className="leading-8 text-zinc-400">
-                    {description}
+                    {dish.description}
                 </p>
 
                 <div className="mt-7 flex items-center justify-between">
@@ -53,7 +49,7 @@ export default function DishCard({image, title, description, price, rating}: Pro
                             className="text-orange-500"
                         />
 
-                        <span className="font-semibold text-white">{rating}</span>
+                        <span className="font-semibold text-white">{dish.rating}</span>
 
                         <span className="text-zinc-500">Rating</span>
                     </div>
