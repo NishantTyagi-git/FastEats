@@ -1,0 +1,54 @@
+import { Schema, model, Types } from "mongoose";
+
+export interface ICartItem {
+    dishId: Types.ObjectId;
+    quantity: number;
+}
+
+export interface ICart {
+    userId: Types.ObjectId;
+    items: ICartItem[];
+}
+
+const cartItemSchema = new Schema<ICartItem>(
+    {
+        dishId: {
+            type: Schema.Types.ObjectId,
+            ref: "Dish",
+            required: true,
+        },
+
+        quantity: {
+            type: Number,
+            required: true,
+            min: 1,
+            default: 1,
+        },
+    },
+    {
+        _id: false,
+    }
+);
+
+const cartSchema = new Schema<ICart>(
+    {
+        userId: {
+            type: Schema.Types.ObjectId,
+            ref: "User",
+            required: true,
+            unique: true,
+        },
+
+        items: {
+            type: [cartItemSchema],
+            default: [],
+        },
+    },
+    {
+        timestamps: true,
+    }
+);
+
+const Cart = model<ICart>("Cart", cartSchema);
+
+export default Cart;
