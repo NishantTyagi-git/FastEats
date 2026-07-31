@@ -29,10 +29,13 @@ const values = [
 export default function AboutPage() {
     return (
         <main className="min-h-screen bg-[#0b0b0b] text-white">
-            <section className="relative overflow-hidden pb-24 pt-36">
-                <div className="absolute left-1/2 top-20 h-80 w-80 -translate-x-1/2 rounded-full bg-orange-500/10 blur-3xl" />
+            <section
+                className="relative flex min-h-screen items-center overflow-hidden bg-[#0b0b0b] bg-cover bg-center bg-no-repeat"
+                style={{ backgroundImage: "url('/images/about/hero.png')" }}
+            >
+                <div className="absolute inset-0 bg-gradient-to-r from-[#0b0b0b] via-[#0b0b0b]/95 to-[#0b0b0b]/25" />
 
-                <div className="relative mx-auto max-w-7xl px-8">
+                <div className="relative mx-auto w-full max-w-7xl px-8">
                     <div className="max-w-3xl">
                         <p className="flex items-center gap-2 font-semibold uppercase tracking-[5px] text-orange-500">
                             <Sparkles size={17} />
@@ -40,7 +43,7 @@ export default function AboutPage() {
                         </p>
 
                         <h1 className="mt-5 text-5xl font-black leading-tight sm:text-6xl lg:text-7xl">
-                            Good food.<br /><span className="text-orange-500">Made simple.</span>
+                            Good food.<br /> <span className="text-orange-500"> Made simple.</span>
                         </h1>
 
                         <p className="mt-8 max-w-2xl text-lg leading-8 text-zinc-400">
@@ -77,29 +80,60 @@ export default function AboutPage() {
                         </p>
                     </div>
 
-                    <div className="rounded-[32px] border border-white/10 bg-[#151515] p-8">
-                        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-500/10">
-                            <Utensils
-                                size={26}
-                                className="text-orange-500"
-                            />
+                    <div className="rounded-[32px] border border-white/10 bg-[#151515] p-8 sm:p-10">
+                        <div className="flex items-start justify-between">
+                            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-500/10">
+                                <Utensils
+                                    size={26}
+                                    className="text-orange-500"
+                                />
+                            </div>
+
+                            <span className="rounded-full border border-orange-500/20 bg-orange-500/5 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-orange-500">
+                                Our Promise
+                            </span>
                         </div>
 
                         <h3 className="mt-7 text-3xl font-black">Our approach</h3>
 
-                        <div className="mt-7 space-y-5">
+                        <p className="mt-3 max-w-md leading-7 text-zinc-400">
+                            We keep the experience simple while never compromising on the things that matter most.
+                        </p>
+
+                        <div className="mt-8 grid gap-4 sm:grid-cols-2">
                             {values.map((value) => (
-                                <div key={value} className="flex items-center gap-4">
+                                <div key={value} className="flex items-center gap-3 rounded-2xl border border-white/5 bg-[#1b1b1b] px-4 py-4">
                                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-orange-500/10">
                                         <Check
-                                            size={16}
+                                            size={15}
                                             className="text-orange-500"
                                         />
                                     </div>
 
-                                    <span className="text-zinc-300">{value}</span>
+                                    <span className="text-sm leading-5 text-zinc-300">{value}</span>
                                 </div>
                             ))}
+                        </div>
+
+                        <div className="mt-8 border-t border-white/5 pt-6">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-xs font-semibold uppercase tracking-[3px] text-zinc-500">
+                                        The FastEats standard
+                                    </p>
+
+                                    <p className="mt-2 text-sm text-zinc-400">
+                                        Fresh food. Simple ordering. Reliable service.
+                                    </p>
+                                </div>
+
+                                <div className="hidden h-10 w-10 items-center justify-center rounded-full bg-orange-500 sm:flex">
+                                    <Heart
+                                        size={18}
+                                        className="text-white"
+                                    />
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -140,20 +174,25 @@ export default function AboutPage() {
 
             <section className="pb-24">
                 <div className="mx-auto max-w-7xl px-8">
-                    <div className="relative overflow-hidden rounded-[36px] border border-orange-500/20 bg-gradient-to-br from-orange-500/15 via-[#151515] to-[#151515] p-10 sm:p-14">
-                        <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-orange-500/10 blur-3xl" />
+                    <div
+                        className="relative overflow-hidden rounded-[36px] border border-orange-500/20 bg-[#151515] bg-cover bg-center bg-no-repeat p-10 sm:p-14"
+                        style={{ backgroundImage: "url('/images/about/cta.png')" }}
+                    >
+                        <div className="absolute inset-0 bg-gradient-to-r from-[#0b0b0b]/95 via-[#0b0b0b]/80 to-[#0b0b0b]/40" />
 
                         <div className="relative max-w-2xl">
                             <div className="flex items-center gap-2 text-orange-500">
                                 <MapPin size={19} />
-                                <span className="font-semibold">FastEats</span>
+                                <span className="font-semibold">
+                                    FastEats
+                                </span>
                             </div>
 
                             <h2 className="mt-5 text-4xl font-black sm:text-5xl">Hungry? Let&apos;s fix that.</h2>
 
                             <p className="mt-5 leading-7 text-zinc-400">Explore our menu and find something worth ordering today.</p>
 
-                            <Link href="/menu" className="mt-8 inline-flex h-14 items-center gap-2 rounded-full bg-orange-500 px-8 font-semibold transition hover:bg-orange-600">
+                            <Link href="/menu" className="mt-8 inline-flex h-14 items-center gap-2 rounded-full bg-orange-500 px-8 font-semibold transition hover:-translate-y-1 hover:bg-orange-600">
                                 Browse Menu
                                 <ArrowRight size={19} />
                             </Link>
