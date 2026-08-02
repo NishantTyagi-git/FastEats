@@ -73,9 +73,11 @@ export default function PersonalInfoPage() {
         setSaved(false);
         setError("");
 
+        const API_URL = process.env.NEXT_PUBLIC_API_URL;
+        
         try {
             const response = await fetch(
-                "http://localhost:5000/api/users/me",
+                `${API_URL}/api/users/me`,
                 {
                     method: "PUT",
                     headers: {

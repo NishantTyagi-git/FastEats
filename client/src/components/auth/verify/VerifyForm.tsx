@@ -49,8 +49,10 @@ export default function VerifyForm() {
     setIsLoading(true);
 
     try {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
       const response = await fetch(
-        "http://localhost:5000/api/auth/verify-email",
+        `${API_URL}/api/auth/verify-email`,
         {
           method: "POST",
           headers: {
@@ -92,8 +94,10 @@ export default function VerifyForm() {
     setIsResending(true);
 
     try {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
       const response = await fetch(
-        "http://localhost:5000/api/auth/resend-verification-otp",
+        `${API_URL}/api/auth/resend-verification-otp`,
         {
           method: "POST",
           headers: {

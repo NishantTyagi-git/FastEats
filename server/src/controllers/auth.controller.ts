@@ -134,17 +134,19 @@ export const loginController = async (
 
         const data = await login(email, password);
 
+        const isProduction = process.env.NODE_ENV === "production";
+
         res.cookie("accessToken", data.accessToken, {
             httpOnly: true,
-            secure: false,
-            sameSite: "lax",
+            secure: isProduction,
+            sameSite: isProduction ? "none" : "lax",
             maxAge: 15 * 60 * 1000,
         });
 
         res.cookie("refreshToken", data.refreshToken, {
             httpOnly: true,
-            secure: false,
-            sameSite: "lax",
+            secure: isProduction,
+            sameSite: isProduction ? "none" : "lax",
             maxAge: 14 * 24 * 60 * 60 * 1000,
         });
 
@@ -180,17 +182,19 @@ export const refreshTokenController = async (
 
         const data = await refreshToken(token);
 
+        const isProduction = process.env.NODE_ENV === "production";
+
         res.cookie("accessToken", data.accessToken, {
             httpOnly: true,
-            secure: false,
-            sameSite: "lax",
+            secure: isProduction,
+            sameSite: isProduction ? "none" : "lax",
             maxAge: 15 * 60 * 1000,
         });
 
         res.cookie("refreshToken", data.refreshToken, {
             httpOnly: true,
-            secure: false,
-            sameSite: "lax",
+            secure: isProduction,
+            sameSite: isProduction ? "none" : "lax",
             maxAge: 14 * 24 * 60 * 60 * 1000,
         });
 

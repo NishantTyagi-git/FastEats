@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { Check, Heart, Plus, Star } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import type { Dish } from "@/types/dish";
 import { useCart } from "@/context/CartContext";
@@ -22,6 +23,7 @@ type WishlistItem = {
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export default function DishCard({ dish }: Props) {
+    const router = useRouter();
     const { addToCart } = useCart();
 
     const [isAdding, setIsAdding] = useState(false);
@@ -30,6 +32,7 @@ export default function DishCard({ dish }: Props) {
     const [isWishlisted, setIsWishlisted] = useState(false);
     const [isWishlistLoading, setIsWishlistLoading] = useState(false);
 
+    // Check wishlist
     useEffect(() => {
         const checkWishlist = async () => {
             try {
@@ -46,7 +49,8 @@ export default function DishCard({ dish }: Props) {
 
                 if (!result.success) return;
 
-                const items: WishlistItem[] = result.data?.items ?? [];
+                const items: WishlistItem[] =
+                    result.data?.items ?? [];
 
                 const exists = items.some((item) => {
                     if (typeof item.dishId === "string") {
@@ -68,6 +72,7 @@ export default function DishCard({ dish }: Props) {
         checkWishlist();
     }, [dish._id]);
 
+    // Wishlist
     const handleWishlist = async () => {
         if (isWishlistLoading) return;
 
@@ -80,13 +85,28 @@ export default function DishCard({ dish }: Props) {
                     : `${API_URL}/api/wishlist`,
                 {
                     method: isWishlisted ? "DELETE" : "POST",
-                    headers: { "Content-Type": "application/json" },
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
                     credentials: "include",
                     ...(isWishlisted
                         ? {}
-                        : { body: JSON.stringify({ dishId: dish._id }) }),
+                        : {
+                            body: JSON.stringify({
+                                dishId: dish._id,
+                            }),
+                        }),
                 }
             );
+
+            // Not logged in
+            if (
+                response.status === 401 ||
+                response.status === 403
+            ) {
+                router.push("/login");
+                return;
+            }
 
             const result = await response.json();
 
@@ -100,21 +120,44 @@ export default function DishCard({ dish }: Props) {
             }
 
             if (result.success) {
-                setIsWishlisted(!isWishlisted);
+                setIsWishlisted((prev) => !prev);
             }
         } catch (error) {
-            console.error("Wishlist error:", error);
+            console.error(
+                "Wishlist error:",
+                error
+            );
         } finally {
             setIsWishlistLoading(false);
         }
     };
 
+    // Add to cart
     const handleAddToCart = async () => {
         if (isAdding || isAdded) return;
 
         try {
             setIsAdding(true);
 
+            // Check authentication first
+            const authResponse = await fetch(
+                `${API_URL}/api/wishlist`,
+                {
+                    method: "GET",
+                    credentials: "include",
+                }
+            );
+
+            // Not logged in
+            if (
+                authResponse.status === 401 ||
+                authResponse.status === 403
+            ) {
+                router.push("/login");
+                return;
+            }
+
+            // Logged in -> add to cart
             await addToCart(dish._id);
 
             setIsAdded(true);
@@ -123,7 +166,10 @@ export default function DishCard({ dish }: Props) {
                 setIsAdded(false);
             }, 1500);
         } catch (error) {
-            console.error("Add to cart error:", error);
+            console.error(
+                "Add to cart error:",
+                error
+            );
         } finally {
             setIsAdding(false);
         }
@@ -131,6 +177,7 @@ export default function DishCard({ dish }: Props) {
 
     return (
         <article className="group overflow-hidden rounded-[28px] border border-white/10 bg-[#181818] transition-all duration-500 hover:-translate-y-2 hover:border-orange-500/30 hover:shadow-[0_25px_50px_rgba(0,0,0,.35)]">
+            {/* Image */}
             <div className="relative overflow-hidden">
                 <Image
                     src={dish.images[0]}
@@ -142,13 +189,14 @@ export default function DishCard({ dish }: Props) {
 
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 transition duration-500 group-hover:opacity-100" />
 
+                {/* Wishlist */}
                 <button
                     type="button"
                     onClick={handleWishlist}
                     disabled={isWishlistLoading}
                     className={`absolute right-5 top-5 flex h-11 w-11 items-center justify-center rounded-full border backdrop-blur-lg transition-all duration-300 hover:scale-105 ${isWishlisted
-                        ? "border-orange-500/30 bg-orange-500"
-                        : "border-white/10 bg-black/40 hover:bg-orange-500"
+                            ? "border-orange-500/30 bg-orange-500"
+                            : "border-white/10 bg-black/40 hover:bg-orange-500"
                         }`}
                 >
                     {isWishlistLoading ? (
@@ -156,12 +204,17 @@ export default function DishCard({ dish }: Props) {
                     ) : (
                         <Heart
                             size={19}
-                            fill={isWishlisted ? "currentColor" : "none"}
+                            fill={
+                                isWishlisted
+                                    ? "currentColor"
+                                    : "none"
+                            }
                             className="text-white"
                         />
                     )}
                 </button>
 
+                {/* Bestseller */}
                 {dish.bestseller && (
                     <span className="absolute left-5 top-5 rounded-full bg-orange-500 px-4 py-2 text-xs font-bold text-white shadow-lg">
                         Bestseller
@@ -169,6 +222,7 @@ export default function DishCard({ dish }: Props) {
                 )}
             </div>
 
+            {/* Content */}
             <div className="p-7">
                 <div className="mb-4 flex items-start justify-between gap-4">
                     <div>
@@ -190,7 +244,9 @@ export default function DishCard({ dish }: Props) {
                     {dish.description}
                 </p>
 
+                {/* Bottom */}
                 <div className="mt-7 flex items-center justify-between">
+                    {/* Rating */}
                     <div className="flex items-center gap-2">
                         <Star
                             size={18}
@@ -207,13 +263,14 @@ export default function DishCard({ dish }: Props) {
                         </span>
                     </div>
 
+                    {/* Add to cart */}
                     <button
                         type="button"
                         onClick={handleAddToCart}
                         disabled={isAdding || isAdded}
                         className={`flex h-12 items-center justify-center rounded-full font-semibold text-white transition-all duration-300 ${isAdded
-                            ? "w-28 bg-emerald-500"
-                            : "w-12 bg-orange-500 hover:w-28 hover:bg-orange-600"
+                                ? "w-28 bg-emerald-500"
+                                : "w-12 bg-orange-500 hover:w-28 hover:bg-orange-600"
                             }`}
                     >
                         {isAdding ? (

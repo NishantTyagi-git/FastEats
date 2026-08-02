@@ -28,6 +28,7 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export function AuthProvider({ children }: {
     children: React.ReactNode;
@@ -37,8 +38,9 @@ export function AuthProvider({ children }: {
 
     const refreshUser = async () => {
         try {
+
             let response = await fetch(
-                "http://localhost:5000/api/users/me",
+                `${API_URL}/api/users/me`,
                 {
                     method: "GET",
                     credentials: "include",
@@ -54,7 +56,7 @@ export function AuthProvider({ children }: {
                 }
 
                 response = await fetch(
-                    "http://localhost:5000/api/users/me",
+                    `${API_URL}/api/users/me`,
                     {
                         method: "GET",
                         credentials: "include",
@@ -91,7 +93,7 @@ export function AuthProvider({ children }: {
     const logout = async () => {
         try {
             const response = await fetch(
-                "http://localhost:5000/api/auth/logout",
+                `${API_URL}/api/auth/logout`,
                 {
                     method: "POST",
                     credentials: "include",
@@ -117,7 +119,7 @@ export function AuthProvider({ children }: {
     const refreshAccessToken = async (): Promise<boolean> => {
         try {
             const response = await fetch(
-                "http://localhost:5000/api/auth/refresh-token",
+                `${API_URL}/api/auth/refresh-token`,
                 {
                     method: "POST",
                     credentials: "include",
