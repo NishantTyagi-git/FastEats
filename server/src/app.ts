@@ -8,6 +8,7 @@ import dishRoutes from "./routes/dish.routes";
 import cartRoutes from "./routes/cart.routes";
 import contactRoutes from "./routes/contact.route";
 import wishlistRoutes from "./routes/wishlist.routes";
+import addressRoutes from "./routes/address.routes";
 
 const app = express();
 
@@ -35,5 +36,6 @@ app.use("/api/users", userRoutes);
 app.use("/api/dishes", dishRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/contact", contactRoutes);
+app.use("/api/addresses", addressRoutes);
 
 export default app;
