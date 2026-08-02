@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { Check, Heart, Plus, Star } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import type { Dish } from "@/types/dish";
 import { useCart } from "@/context/CartContext";
@@ -11,11 +11,103 @@ type Props = {
     dish: Dish;
 };
 
+type WishlistItem = {
+    dishId:
+    | string
+    | {
+        _id: string;
+    };
+};
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 export default function DishCard({ dish }: Props) {
     const { addToCart } = useCart();
 
     const [isAdding, setIsAdding] = useState(false);
     const [isAdded, setIsAdded] = useState(false);
+
+    const [isWishlisted, setIsWishlisted] = useState(false);
+    const [isWishlistLoading, setIsWishlistLoading] = useState(false);
+
+    useEffect(() => {
+        const checkWishlist = async () => {
+            try {
+                const response = await fetch(
+                    `${API_URL}/api/wishlist`,
+                    {
+                        credentials: "include",
+                    }
+                );
+
+                if (!response.ok) return;
+
+                const result = await response.json();
+
+                if (!result.success) return;
+
+                const items: WishlistItem[] = result.data?.items ?? [];
+
+                const exists = items.some((item) => {
+                    if (typeof item.dishId === "string") {
+                        return item.dishId === dish._id;
+                    }
+
+                    return item.dishId?._id === dish._id;
+                });
+
+                setIsWishlisted(exists);
+            } catch (error) {
+                console.error(
+                    "Check wishlist error:",
+                    error
+                );
+            }
+        };
+
+        checkWishlist();
+    }, [dish._id]);
+
+    const handleWishlist = async () => {
+        if (isWishlistLoading) return;
+
+        try {
+            setIsWishlistLoading(true);
+
+            const response = await fetch(
+                isWishlisted
+                    ? `${API_URL}/api/wishlist/${dish._id}`
+                    : `${API_URL}/api/wishlist`,
+                {
+                    method: isWishlisted ? "DELETE" : "POST",
+                    headers: { "Content-Type": "application/json" },
+                    credentials: "include",
+                    ...(isWishlisted
+                        ? {}
+                        : { body: JSON.stringify({ dishId: dish._id }) }),
+                }
+            );
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                console.error(
+                    "Wishlist error:",
+                    result.message
+                );
+
+                return;
+            }
+
+            if (result.success) {
+                setIsWishlisted(!isWishlisted);
+            }
+        } catch (error) {
+            console.error("Wishlist error:", error);
+        } finally {
+            setIsWishlistLoading(false);
+        }
+    };
 
     const handleAddToCart = async () => {
         if (isAdding || isAdded) return;
@@ -52,13 +144,22 @@ export default function DishCard({ dish }: Props) {
 
                 <button
                     type="button"
-                    aria-label={`Add ${dish.title} to wishlist`}
-                    className="absolute right-5 top-5 flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-black/40 backdrop-blur-lg transition-all duration-300 hover:scale-105 hover:bg-orange-500"
+                    onClick={handleWishlist}
+                    disabled={isWishlistLoading}
+                    className={`absolute right-5 top-5 flex h-11 w-11 items-center justify-center rounded-full border backdrop-blur-lg transition-all duration-300 hover:scale-105 ${isWishlisted
+                        ? "border-orange-500/30 bg-orange-500"
+                        : "border-white/10 bg-black/40 hover:bg-orange-500"
+                        }`}
                 >
-                    <Heart
-                        size={19}
-                        className="text-white"
-                    />
+                    {isWishlistLoading ? (
+                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                    ) : (
+                        <Heart
+                            size={19}
+                            fill={isWishlisted ? "currentColor" : "none"}
+                            className="text-white"
+                        />
+                    )}
                 </button>
 
                 {dish.bestseller && (
@@ -71,15 +172,23 @@ export default function DishCard({ dish }: Props) {
             <div className="p-7">
                 <div className="mb-4 flex items-start justify-between gap-4">
                     <div>
-                        <p className="mb-1 text-xs font-semibold uppercase tracking-[3px] text-orange-500">{dish.category}</p>
+                        <p className="mb-1 text-xs font-semibold uppercase tracking-[3px] text-orange-500">
+                            {dish.category}
+                        </p>
 
-                        <h3 className="text-2xl font-bold text-white">{dish.title}</h3>
+                        <h3 className="text-2xl font-bold text-white">
+                            {dish.title}
+                        </h3>
                     </div>
 
-                    <span className="shrink-0 text-2xl font-black text-orange-500">₹{dish.price}</span>
+                    <span className="shrink-0 text-2xl font-black text-orange-500">
+                        ₹{dish.price}
+                    </span>
                 </div>
 
-                <p className="line-clamp-2 leading-8 text-zinc-400">{dish.description}</p>
+                <p className="line-clamp-2 leading-8 text-zinc-400">
+                    {dish.description}
+                </p>
 
                 <div className="mt-7 flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -89,20 +198,19 @@ export default function DishCard({ dish }: Props) {
                             className="text-orange-500"
                         />
 
-                        <span className="font-semibold text-white">{dish.rating}</span>
+                        <span className="font-semibold text-white">
+                            {dish.rating}
+                        </span>
 
-                        <span className="text-sm text-zinc-500">Rating</span>
+                        <span className="text-sm text-zinc-500">
+                            Rating
+                        </span>
                     </div>
 
                     <button
                         type="button"
                         onClick={handleAddToCart}
                         disabled={isAdding || isAdded}
-                        aria-label={
-                            isAdded
-                                ? `${dish.title} added to cart`
-                                : `Add ${dish.title} to cart`
-                        }
                         className={`flex h-12 items-center justify-center rounded-full font-semibold text-white transition-all duration-300 ${isAdded
                             ? "w-28 bg-emerald-500"
                             : "w-12 bg-orange-500 hover:w-28 hover:bg-orange-600"
@@ -114,7 +222,9 @@ export default function DishCard({ dish }: Props) {
                             <>
                                 <Check size={19} />
 
-                                <span className="ml-2 text-sm">Added</span>
+                                <span className="ml-2 text-sm">
+                                    Added
+                                </span>
                             </>
                         ) : (
                             <Plus size={22} />
