@@ -1,10 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, CreditCard, LockKeyhole, MoreHorizontal, Plus, ShieldCheck, Trash2, WalletCards } from "lucide-react";
-import { useState } from "react";
+import { ArrowLeft, CreditCard, LockKeyhole, Plus, ShieldCheck, WalletCards, Check, Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import PaymentCard from "@/components/store/profile/payment-methods/PaymentCard";
+import Field from "@/components/store/profile/addresses/Field";
+import ErrorMessage from "@/components/store/profile/payment-methods/ErrorMessage";
 
-interface PaymentMethod {
+type PaymentMethod = {
     id: string;
     type: "card" | "upi";
     name: string;
@@ -12,33 +15,31 @@ interface PaymentMethod {
     expiry?: string;
     upiId?: string;
     isDefault: boolean;
-}
+};
 
-const initialMethods: PaymentMethod[] = [
-    {
-        id: "card-1",
-        type: "card",
-        name: "Visa",
-        last4: "4242",
-        expiry: "12/28",
-        isDefault: true,
-    },
-    {
-        id: "upi-1",
-        type: "upi",
-        name: "UPI",
-        upiId: "nishant@upi",
-        isDefault: false,
-    },
-];
+type ApiPaymentMethod = {
+    _id: string;
+    type: "card" | "upi";
+    brand?: string;
+    last4?: string;
+    expiry?: string;
+    upiId?: string;
+    isDefault: boolean;
+};
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export default function PaymentMethodsPage() {
-    const [methods, setMethods] =
-        useState<PaymentMethod[]>(initialMethods);
+    const [methods, setMethods] = useState<PaymentMethod[]>([]);
 
+    const [loading, setLoading] = useState(true);
     const [showAdd, setShowAdd] = useState(false);
-    const [methodType, setMethodType] =
-        useState<"card" | "upi">("card");
+
+    const [methodType, setMethodType] = useState<"card" | "upi">("card");
+
+    const [submitting, setSubmitting] = useState(false);
+    const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
 
     const [cardData, setCardData] = useState({
         number: "",
@@ -49,6 +50,52 @@ export default function PaymentMethodsPage() {
 
     const [upiId, setUpiId] = useState("");
 
+    const fetchPaymentMethods = async () => {
+        try {
+            setLoading(true);
+            setError("");
+
+            const response = await fetch(
+                `${API_URL}/api/payment-methods`,
+                {
+                    method: "GET",
+                    credentials: "include",
+                    cache: "no-store",
+                }
+            );
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.message || "Failed to fetch payment methods.");
+            }
+
+            const apiMethods: ApiPaymentMethod[] =
+                Array.isArray(result.data) ? result.data : [];
+
+            const formattedMethods: PaymentMethod[] = apiMethods.map((method) => ({
+                id: method._id,
+                type: method.type,
+                name: method.type === "card" ? method.brand || "Card" : "UPI",
+                last4: method.last4,
+                expiry: method.expiry,
+                upiId: method.upiId,
+                isDefault: method.isDefault,
+            }));
+
+            setMethods(formattedMethods);
+        } catch (error) {
+            console.error("Fetch payment methods error:", error);
+            setError(error instanceof Error ? error.message : "Failed to fetch payment methods.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchPaymentMethods();
+    }, []);
+
     const handleCardChange = (
         e: React.ChangeEvent<HTMLInputElement>
     ) => {
@@ -58,39 +105,22 @@ export default function PaymentMethodsPage() {
             ...prev,
             [name]: value,
         }));
+
+        setError("");
     };
 
-    const addPaymentMethod = (
-        e: React.FormEvent<HTMLFormElement>
-    ) => {
-        e.preventDefault();
+    const openAddModal = () => {
+        setError("");
+        setSuccess("");
+        setMethodType("card");
+        setShowAdd(true);
+    };
 
-        if (methodType === "card") {
-            const number = cardData.number.replace(/\s/g, "");
-
-            const newMethod: PaymentMethod = {
-                id: crypto.randomUUID(),
-                type: "card",
-                name: "Visa",
-                last4: number.slice(-4) || "0000",
-                expiry: cardData.expiry || "12/28",
-                isDefault: methods.length === 0,
-            };
-
-            setMethods((prev) => [...prev, newMethod]);
-        } else {
-            const newMethod: PaymentMethod = {
-                id: crypto.randomUUID(),
-                type: "upi",
-                name: "UPI",
-                upiId: upiId || "example@upi",
-                isDefault: methods.length === 0,
-            };
-
-            setMethods((prev) => [...prev, newMethod]);
-        }
+    const closeAddModal = () => {
+        if (submitting) return;
 
         setShowAdd(false);
+        setError("");
 
         setCardData({
             number: "",
@@ -102,56 +132,273 @@ export default function PaymentMethodsPage() {
         setUpiId("");
     };
 
-    const deleteMethod = (id: string) => {
-        setMethods((prev) => {
-            const remaining = prev.filter(
-                (method) => method.id !== id
-            );
+    const addPaymentMethod = async (
+        e: React.FormEvent<HTMLFormElement>
+    ) => {
+        e.preventDefault();
 
-            if (
-                remaining.length > 0 &&
-                !remaining.some((method) => method.isDefault)
-            ) {
-                remaining[0].isDefault = true;
+        if (submitting) return;
+
+        setError("");
+        setSuccess("");
+
+
+        if (methodType === "upi") {
+            const cleanUpi = upiId.trim().toLowerCase();
+
+            if (!cleanUpi) {
+                setError("Please enter your UPI ID.");
+                return;
             }
 
-            return remaining;
-        });
+            const upiRegex = /^[\w.-]+@[\w.-]+$/;
+
+            if (!upiRegex.test(cleanUpi)) {
+                setError("Please enter a valid UPI ID.");
+                return;
+            }
+
+            try {
+                setSubmitting(true);
+
+                const response = await fetch(`${API_URL}/api/payment-methods`, {
+                    method: "POST",
+                    credentials: "include",
+                    headers: { "Content-Type": "application/json", },
+                    body: JSON.stringify({ type: "upi", upiId: cleanUpi, }),
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(
+                        result.message ||
+                        "Failed to add payment method."
+                    );
+                }
+
+                const method: ApiPaymentMethod = result.data;
+
+                const newMethod: PaymentMethod = {
+                    id: method._id,
+                    type: method.type,
+                    name: "UPI",
+                    upiId: method.upiId,
+                    isDefault: method.isDefault,
+                };
+
+                setMethods((prev) => [
+                    ...prev,
+                    newMethod,
+                ]);
+
+                setSuccess("UPI payment method added successfully.");
+
+                setUpiId("");
+
+                setTimeout(() => {
+                    setShowAdd(false);
+                    setSuccess("");
+                }, 1000);
+            } catch (error) {
+                console.error("Add UPI payment method error:", error);
+
+                setError(error instanceof Error ? error.message : "Failed to add payment method.");
+            } finally {
+                setSubmitting(false);
+            }
+
+            return;
+        }
+
+        const cardNumber = cardData.number.replace(/\s/g, "");
+
+        if (!/^\d{12,19}$/.test(cardNumber)) {
+            setError("Please enter a valid card number.");
+            return;
+        }
+
+        if (!cardData.name.trim()) {
+            setError("Please enter the name on your card.");
+            return;
+        }
+
+        if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(cardData.expiry.trim())) {
+            setError("Please enter expiry as MM/YY.");
+            return;
+        }
+
+        if (!/^\d{3,4}$/.test(cardData.cvv)) {
+            setError("Please enter a valid CVV.");
+            return;
+        }
+
+        try {
+            setSubmitting(true);
+
+            const response = await fetch(
+                `${API_URL}/api/payment-methods`,
+                {
+                    method: "POST",
+                    credentials: "include",
+                    headers: { "Content-Type": "application/json", },
+                    body: JSON.stringify({
+                        type: "card",
+
+                        brand: "Visa",
+                        last4: cardNumber.slice(-4),
+                        expiry: cardData.expiry.trim(),
+                    }),
+                }
+            );
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    result.message ||
+                    "Failed to add payment method."
+                );
+            }
+
+            const method: ApiPaymentMethod = result.data;
+
+            const newMethod: PaymentMethod = {
+                id: method._id,
+                type: method.type,
+                name: method.brand || "Card",
+                last4: method.last4,
+                expiry: method.expiry,
+                isDefault: method.isDefault,
+            };
+
+            setMethods((prev) => [
+                ...prev,
+                newMethod,
+            ]);
+
+            setSuccess("Payment method added successfully.");
+
+            setCardData({
+                number: "",
+                name: "",
+                expiry: "",
+                cvv: "",
+            });
+
+            setTimeout(() => {
+                setShowAdd(false);
+                setSuccess("");
+            }, 1000);
+        } catch (error) {
+            console.error("Add card payment method error:", error);
+
+            setError(error instanceof Error ? error.message : "Failed to add payment method.");
+        } finally {
+            setSubmitting(false);
+        }
     };
 
-    const setDefault = (id: string) => {
-        setMethods((prev) =>
-            prev.map((method) => ({
-                ...method,
-                isDefault: method.id === id,
-            }))
-        );
+    const deleteMethod = async (id: string) => {
+        try {
+            setError("");
+
+            const response = await fetch(
+                `${API_URL}/api/payment-methods/${id}`,
+                {
+                    method: "DELETE",
+                    credentials: "include",
+                }
+            );
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    result.message ||
+                    "Failed to remove payment method."
+                );
+            }
+
+            setMethods((prev) => {
+                const remaining = prev.filter(
+                    (method) => method.id !== id
+                );
+
+                return remaining;
+            });
+
+            await fetchPaymentMethods();
+        } catch (error) {
+            console.error("Delete payment method error:", error);
+
+            setError(error instanceof Error ? error.message : "Failed to remove payment method.");
+        }
+    };
+
+    const setDefault = async (id: string) => {
+        try {
+            setError("");
+
+            const response = await fetch(
+                `${API_URL}/api/payment-methods/${id}/default`,
+                {
+                    method: "PATCH",
+                    credentials: "include",
+                }
+            );
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.message || "Failed to update default payment method.");
+            }
+
+            setMethods((prev) =>
+                prev.map((method) => ({
+                    ...method,
+                    isDefault: method.id === id,
+                }))
+            );
+        } catch (error) {
+            console.error("Set default payment method error:", error);
+
+            setError(error instanceof Error ? error.message : "Failed to update default payment method.");
+        }
     };
 
     return (
         <main className="min-h-screen bg-[#090909] px-5 pb-24 pt-28 text-white md:px-8">
             <div className="mx-auto max-w-5xl">
-
                 <Link href="/profile" className="group inline-flex items-center gap-2 text-sm text-zinc-500 transition hover:text-orange-500">
                     <ArrowLeft
                         size={15}
                         className="transition-transform group-hover:-translate-x-1"
                     />
+
                     Back to Profile
                 </Link>
 
+
                 <div className="mt-9 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
                     <div>
-                        <p className="text-[11px] font-semibold uppercase tracking-[0.4em] text-orange-500">Account</p>
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.4em] text-orange-500">
+                            Account
+                        </p>
 
-                        <h1 className="mt-3 font-serif text-4xl font-bold tracking-tight md:text-5xl">Payment Methods</h1>
+                        <h1 className="mt-3 font-serif text-4xl font-bold tracking-tight md:text-5xl">
+                            Payment Methods
+                        </h1>
 
-                        <p className="mt-3 max-w-xl text-sm leading-6 text-zinc-500">Manage your saved payment methods for faster and easier checkout.</p>
+                        <p className="mt-3 max-w-xl text-sm leading-6 text-zinc-500">
+                            Manage your saved payment methods for
+                            faster and easier checkout.
+                        </p>
                     </div>
 
                     <button
                         type="button"
-                        onClick={() => setShowAdd(true)}
+                        onClick={openAddModal}
                         className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-orange-500 px-5 text-xs font-semibold text-white transition hover:bg-orange-600"
                     >
                         <Plus size={16} />
@@ -159,19 +406,38 @@ export default function PaymentMethodsPage() {
                     </button>
                 </div>
 
+
+                {error && !showAdd && (
+                    <ErrorMessage
+                        message={error}
+                        onClose={() => setError("")}
+                    />
+                )}
+
                 <div className="mt-9 flex items-start gap-4 rounded-2xl border border-emerald-500/10 bg-emerald-500/[0.04] px-5 py-4">
                     <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-500">
                         <ShieldCheck size={18} />
                     </div>
 
                     <div>
-                        <p className="text-sm font-medium text-zinc-300">Your payment information is secure</p>
+                        <p className="text-sm font-medium text-zinc-300">
+                            Your payment information is secure
+                        </p>
 
-                        <p className="mt-1 text-xs leading-5 text-zinc-600">Payment details are protected and your full card information is never displayed.</p>
+                        <p className="mt-1 text-xs leading-5 text-zinc-600">
+                            Payment details are protected and your full card information is never displayed.
+                        </p>
                     </div>
                 </div>
 
-                {methods.length > 0 ? (
+                {loading ? (
+                    <div className="mt-10 flex justify-center py-20">
+                        <Loader2
+                            size={28}
+                            className="animate-spin text-orange-500"
+                        />
+                    </div>
+                ) : methods.length > 0 ? (
                     <div className="mt-7 space-y-4">
                         {methods.map((method) => (
                             <PaymentCard
@@ -188,13 +454,17 @@ export default function PaymentMethodsPage() {
                             <WalletCards size={26} />
                         </div>
 
-                        <h2 className="mt-6 font-serif text-2xl font-bold">No payment methods</h2>
+                        <h2 className="mt-6 font-serif text-2xl font-bold">
+                            No payment methods
+                        </h2>
 
-                        <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-zinc-600">Add a card or UPI account to make your checkout experience faster.</p>
+                        <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-zinc-600">
+                            Add a card or UPI account to make your checkout experience faster.
+                        </p>
 
                         <button
                             type="button"
-                            onClick={() => setShowAdd(true)}
+                            onClick={openAddModal}
                             className="mt-7 inline-flex items-center gap-2 rounded-xl bg-orange-500 px-6 py-3 text-xs font-semibold text-white transition hover:bg-orange-600"
                         >
                             <Plus size={15} />
@@ -217,35 +487,55 @@ export default function PaymentMethodsPage() {
 
             {showAdd && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 px-5 backdrop-blur-sm">
-                    <div className="absolute inset-0" onClick={() => setShowAdd(false)} />
+                    <div className="absolute inset-0" onClick={closeAddModal} />
 
                     <div className="relative max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-3xl border border-white/10 bg-[#141414] shadow-2xl">
                         <div className="border-b border-white/10 px-6 py-5 md:px-8">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-orange-500">Payment</p>
+                                    <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-orange-500">
+                                        Payment
+                                    </p>
 
-                                    <h2 className="mt-1 font-serif text-2xl font-bold">Add Payment Method</h2>
+                                    <h2 className="mt-1 font-serif text-2xl font-bold">
+                                        Add Payment Method
+                                    </h2>
                                 </div>
 
                                 <button
                                     type="button"
-                                    onClick={() => setShowAdd(false)}
-                                    className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 text-zinc-500 transition hover:border-white/20 hover:text-white"
+                                    onClick={closeAddModal}
+                                    disabled={submitting}
+                                    className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 text-zinc-500 transition hover:border-white/20 hover:text-white disabled:opacity-50"
                                 >
                                     ×
                                 </button>
                             </div>
                         </div>
 
+                        {error && (
+                            <div className="px-6 pt-5 md:px-8">
+                                <ErrorMessage
+                                    message={error}
+                                    onClose={() => setError("")}
+                                />
+                            </div>
+                        )}
+
+                        {success && (
+                            <div className="px-6 pt-5 md:px-8">
+                                <div className="flex items-center gap-3 rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-400">
+                                    <Check size={17} />
+                                    {success}
+                                </div>
+                            </div>
+                        )}
+
                         <div className="grid grid-cols-2 gap-2 px-6 pt-6 md:px-8">
                             <button
                                 type="button"
-                                onClick={() => setMethodType("card")}
-                                className={`flex items-center justify-center gap-2 rounded-xl border py-3 text-xs font-semibold transition ${methodType === "card"
-                                    ? "border-orange-500/40 bg-orange-500/10 text-orange-500"
-                                    : "border-white/10 bg-[#0d0d0d] text-zinc-500 hover:text-white"
-                                    }`}
+                                onClick={() => { setMethodType("card"); setError(""); }}
+                                className={`flex items-center justify-center gap-2 rounded-xl border py-3 text-xs font-semibold transition ${methodType === "card" ? "border-orange-500/40 bg-orange-500/10 text-orange-500" : "border-white/10 bg-[#0d0d0d] text-zinc-500 hover:text-white"}`}
                             >
                                 <CreditCard size={16} />
                                 Card
@@ -253,7 +543,9 @@ export default function PaymentMethodsPage() {
 
                             <button
                                 type="button"
-                                onClick={() => setMethodType("upi")}
+                                onClick={() => {
+                                    setMethodType("upi"); setError("");
+                                }}
                                 className={`flex items-center justify-center gap-2 rounded-xl border py-3 text-xs font-semibold transition ${methodType === "upi"
                                     ? "border-orange-500/40 bg-orange-500/10 text-orange-500"
                                     : "border-white/10 bg-[#0d0d0d] text-zinc-500 hover:text-white"
@@ -316,34 +608,53 @@ export default function PaymentMethodsPage() {
                                         label="UPI ID"
                                         name="upi"
                                         value={upiId}
-                                        onChange={(e) =>
-                                            setUpiId(e.target.value)
-                                        }
+                                        onChange={(e) => { setUpiId(e.target.value); setError(""); }}
                                         placeholder="yourname@upi"
                                         required
                                     />
 
                                     <div className="rounded-xl border border-white/5 bg-[#0d0d0d] p-4 text-xs leading-5 text-zinc-600">
-                                        Example: yourname@oksbi, yourname@ybl, or yourname@paytm
+                                        Example:
+                                        <br />
+                                        yourname@oksbi
+                                        <br />
+                                        yourname@ybl
+                                        <br />
+                                        yourname@paytm
                                     </div>
                                 </>
                             )}
 
+
                             <div className="flex justify-end gap-3 border-t border-white/10 pt-6">
                                 <button
                                     type="button"
-                                    onClick={() => setShowAdd(false)}
-                                    className="h-11 rounded-xl border border-white/10 px-5 text-xs font-semibold text-zinc-400 transition hover:text-white"
+                                    onClick={closeAddModal}
+                                    disabled={submitting}
+                                    className="h-11 rounded-xl border border-white/10 px-5 text-xs font-semibold text-zinc-400 transition hover:text-white disabled:opacity-50"
                                 >
                                     Cancel
                                 </button>
 
                                 <button
                                     type="submit"
-                                    className="inline-flex h-11 items-center gap-2 rounded-xl bg-orange-500 px-6 text-xs font-semibold text-white transition hover:bg-orange-600"
+                                    disabled={submitting}
+                                    className="inline-flex h-11 items-center gap-2 rounded-xl bg-orange-500 px-6 text-xs font-semibold text-white transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
                                 >
-                                    <Plus size={15} />
-                                    Add Method
+                                    {submitting ? (
+                                        <>
+                                            <Loader2
+                                                size={15}
+                                                className="animate-spin"
+                                            />
+                                            Adding...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Plus size={15} />
+                                            Add Method
+                                        </>
+                                    )}
                                 </button>
                             </div>
                         </form>
@@ -351,148 +662,5 @@ export default function PaymentMethodsPage() {
                 </div>
             )}
         </main>
-    );
-}
-
-function PaymentCard({
-    method,
-    onDelete,
-    onSetDefault,
-}: {
-    method: PaymentMethod;
-    onDelete: (id: string) => void;
-    onSetDefault: (id: string) => void;
-}) {
-    const [menuOpen, setMenuOpen] = useState(false);
-
-    return (
-        <article className="relative rounded-3xl border border-white/10 bg-[#141414] p-6 transition hover:border-white/15 md:p-7">
-            <div className="flex items-center gap-5">
-                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[#0d0d0d] text-zinc-400">
-                    {method.type === "card" ? (
-                        <CreditCard size={24} />
-                    ) : (
-                        <WalletCards size={24} />
-                    )}
-                </div>
-
-                <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                        <h2 className="font-semibold text-white">
-                            {method.type === "card"
-                                ? method.name
-                                : "UPI"}
-                        </h2>
-
-                        {method.isDefault && (
-                            <span className="rounded-full bg-orange-500/10 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-wider text-orange-500">
-                                Default
-                            </span>
-                        )}
-                    </div>
-
-                    {method.type === "card" ? (
-                        <>
-                            <p className="mt-1 text-sm tracking-widest text-zinc-500">
-                                •••• •••• •••• {method.last4}
-                            </p>
-
-                            <p className="mt-1 text-[10px] text-zinc-700">
-                                Expires {method.expiry}
-                            </p>
-                        </>
-                    ) : (
-                        <p className="mt-1 text-sm text-zinc-500">
-                            {method.upiId}
-                        </p>
-                    )}
-                </div>
-
-                <div className="relative">
-                    <button
-                        type="button"
-                        onClick={() => setMenuOpen((prev) => !prev)}
-                        className="flex h-9 w-9 items-center justify-center rounded-lg text-zinc-600 transition hover:bg-white/5 hover:text-white"
-                    >
-                        <MoreHorizontal size={18} />
-                    </button>
-
-                    {menuOpen && (
-                        <div className="absolute right-0 top-11 z-20 w-44 overflow-hidden rounded-xl border border-white/10 bg-[#1b1b1b] p-1 shadow-2xl">
-                            {!method.isDefault && (
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        onSetDefault(method.id);
-                                        setMenuOpen(false);
-                                    }}
-                                    className="w-full rounded-lg px-3 py-2.5 text-left text-xs text-zinc-400 transition hover:bg-white/5 hover:text-white"
-                                >
-                                    Make Default
-                                </button>
-                            )}
-
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    onDelete(method.id);
-                                    setMenuOpen(false);
-                                }}
-                                className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-xs text-red-400 transition hover:bg-red-500/10"
-                            >
-                                <Trash2 size={14} />
-                                Remove
-                            </button>
-                        </div>
-                    )}
-                </div>
-            </div>
-
-            {method.isDefault && (
-                <div className="mt-5 flex items-center gap-2 text-xs text-emerald-500">
-                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500/10">
-                        ✓
-                    </span>
-                    Used automatically during checkout
-                </div>
-            )}
-        </article>
-    );
-}
-
-function Field({
-    label,
-    name,
-    value,
-    onChange,
-    placeholder,
-    required = false,
-}: {
-    label: string;
-    name: string;
-    value: string;
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    placeholder?: string;
-    required?: boolean;
-}) {
-    return (
-        <div>
-            <label
-                htmlFor={name}
-                className="mb-2 block text-xs font-medium text-zinc-400"
-            >
-                {label}
-            </label>
-
-            <input
-                id={name}
-                name={name}
-                value={value}
-                onChange={onChange}
-                placeholder={placeholder}
-                required={required}
-                className="h-12 w-full rounded-xl border border-white/10 bg-[#0d0d0d] px-4 text-sm text-white outline-none transition placeholder:text-zinc-700 hover:border-white/15 focus:border-orange-500/70 focus:ring-1 focus:ring-orange-500/10"
-            />
-        </div>
     );
 }

@@ -9,6 +9,7 @@ import cartRoutes from "./routes/cart.routes";
 import contactRoutes from "./routes/contact.route";
 import wishlistRoutes from "./routes/wishlist.routes";
 import addressRoutes from "./routes/address.routes";
+import paymentMethodRoutes from "./routes/paymentMethod.routes";
 
 const app = express();
 
@@ -37,5 +38,6 @@ app.use("/api/dishes", dishRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/addresses", addressRoutes);
+app.use("/api/payment-methods", paymentMethodRoutes);
 
 export default app;
